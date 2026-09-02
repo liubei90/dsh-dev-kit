@@ -1,0 +1,21 @@
+# Git hooks (lefthook). Fast local checkpoints; CI owns the full gate matrix.
+# Install: `node scripts/install-lefthook.mjs` (runs automatically via postinstall).
+
+pre-commit:
+  jobs:
+    - name: lint (staged)
+      glob: '*.{ts,tsx}'
+      run: pnpm exec eslint {staged_files}
+      stage_fixed: true
+    - name: whitespace (staged)
+      run: git diff --cached --check
+    - name: agent note format (staged)
+      glob: '.agents/notes/**'
+      run: pnpm run verify-agent-note-format
+
+pre-push:
+  jobs:
+    - name: typecheck
+      run: pnpm run typecheck
+    - name: affected tests
+      run: pnpm run test:affected

@@ -1,0 +1,15 @@
+node_modules/
+lib/
+*.tsbuildinfo
+dist/
+coverage/
+.env
+.env.*
+!.env.example
+.DS_Store
+.pnpm-store/
+.pytest_cache/
+__pycache__/
+.artifacts/
+tmp/
+.pnpm-home/

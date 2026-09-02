@@ -1,0 +1,37 @@
+{
+  "name": "dsh-dev-kit",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI-agent-first full-stack TypeScript monorepo template (pnpm workspaces), migrating the DeepSeek Harness development system: layered AGENTS.md + Agent Notes + skills + mechanical gates",
+  "type": "module",
+  "packageManager": "pnpm@9.12.0",
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "scripts": {
+    "build": "tsc -b apps/api apps/web packages/shared",
+    "typecheck": "tsc -b apps/api apps/web packages/shared --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "vitest run --config vitest.e2e.config.ts",
+    "test:affected": "tsx scripts/run-affected-tests.ts",
+    "doc-sync": "tsx scripts/run-gates.ts",
+    "verify-agent-note-format": "tsx scripts/verify-agent-note-format.ts",
+    "verify-archived-agent-notes": "tsx scripts/verify-archived-agent-notes.ts",
+    "change-scope": "tsx scripts/change-scope.ts",
+    "check:all": "tsx scripts/run-gates.ts check-all"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.0.0",
+    "@vitest/coverage-v8": "^2.1.0",
+    "eslint": "^9.0.0",
+    "globals": "^17.12.0",
+    "lefthook": "^1.7.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "typescript-eslint": "^8.69.0",
+    "vitest": "^2.1.0"
+  }
+}
