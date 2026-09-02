@@ -1,6 +1,6 @@
 # Agent Notes
 
-One kind of design doc lives here. An **Agent Note** records a decision or proposal that affects this codebase — the *why* and *what we gave up*, the parts code and docs can't carry. This file defines where Agent Notes live, when to write one, and [the in-file format](#the-file-format). (A bilingual `.zh.md` counterpart is optional; add one only when the project enables bilingual documentation.)
+One kind of design doc lives here. An **Agent Note** records a decision or proposal that affects this codebase — the *why* and *what we gave up*, the parts code and docs can't carry. This file defines where Agent Notes live, when to write one, and [the in-file format](#the-file-format). Bilingual pairing is enabled: every Agent Note ships an English `.md` and a `.zh.md` counterpart (see [Chinese counterparts](#chinese-counterparts)).
 
 ## Layout and naming
 
@@ -120,4 +120,4 @@ Moving a file between lifecycle folders means updating the `Status:` line and re
 
 ### Chinese counterparts
 
-A `.zh.md` counterpart mirrors its English sibling's structure section-for-section under the repository's bilingual i18n contract (optional; see docs/i18n/README.md); the machine-checked header tokens (`# Agent Note: ` and the `Status:` line) stay in English verbatim. The format gate skips `.zh.md` files — the pairing gate checks their consistency.
+Every Agent Note has a `.zh.md` counterpart mirroring its English sibling's structure section-for-section; the machine-checked header tokens (`# Agent Note: ` and the `Status:` line) stay in English verbatim in both files. `verify-agent-note-format` checks `.md` files only; `verify-md-links` and `verify-md-wrap` still cover `.zh.md` files.

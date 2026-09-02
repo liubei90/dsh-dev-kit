@@ -10,7 +10,7 @@
   },
   "scripts": {
     "build": "tsc -b apps/api apps/web packages/shared",
-    "typecheck": "tsc -b apps/api apps/web packages/shared --noEmit",
+    "typecheck": "tsc -b apps/api apps/web packages/shared",
     "lint": "eslint .",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
