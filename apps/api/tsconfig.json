@@ -4,5 +4,6 @@
     "rootDir": "src",
     "outDir": "lib/types"
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts"],
+  "references": [{ "path": "../../packages/shared" }]
 }

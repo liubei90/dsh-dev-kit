@@ -13,3 +13,4 @@ __pycache__/
 .artifacts/
 tmp/
 .pnpm-home/
+apps/api/data/

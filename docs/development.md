@@ -7,6 +7,12 @@
 - Node.js ≥ 20.19;启用 Corepack 的 pnpm。
 - `pnpm install` 安装依赖并自动配置 lefthook hooks(`scripts/install-lefthook.mjs`);缺失时手动运行该脚本。
 - 首次 `pnpm run typecheck` 通过即环境就绪。
+- 运行 apps/api 前:复制 `.env.example` 为根 `.env` 并填 `JWT_SECRET`(必填,生成示例 `openssl rand -hex 32`);缺省 SQLite 数据落在 gitignore 的 `apps/api/data/dev.sqlite`。
+
+## 本地运行
+
+- API:`pnpm --filter @devkit/api dev`(tsx watch);显式跑迁移 `pnpm --filter @devkit/api migrate`(启动时也会自动跑)。
+- Web:`pnpm --filter @devkit/web dev`(Vite,`/auth` 代理到 API)。
 
 ## 日常流程
 
