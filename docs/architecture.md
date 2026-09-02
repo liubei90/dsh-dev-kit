@@ -10,7 +10,7 @@ apps/api(Fastify)→ 路由模块 → 服务逻辑 → repository → SQLite(bet
 packages/shared → ApiEnvelope、auth DTO/错误码、校验助手(契约单一来源)
 ```
 
-- 每个 app 与包的合同见各自 README:`apps/api/README.md`、`apps/web/README.md`。
+- `apps/api` 与 `apps/web` 的合同见各自 README;`packages/shared` 的契约即 `src/index.ts`,是前后端共享的唯一事实源。
 - 认证的决策与取舍见 [feature Agent Note](../.agents/notes/proposed/feature/2026-09-02-user-accounts-and-login.md) 与 [architecture Agent Note](../.agents/notes/proposed/architecture/2026-09-02-bootstrap-runtime-stack.md)。
 
 ## 分层规则

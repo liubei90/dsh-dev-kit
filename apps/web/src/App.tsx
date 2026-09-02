@@ -7,6 +7,7 @@ import type { PublicUser } from '@devkit/shared'
 import {
   ApiClientError,
   fetchCurrentUser,
+  getToken,
   login,
   logout,
   register,
@@ -26,7 +27,7 @@ export function App() {
 
   useEffect(() => {
     let cancelled = false
-    if (window.localStorage.getItem('auth_token') === null) return
+    if (getToken() === null) return
     fetchCurrentUser()
       .then((current) => {
         if (!cancelled) setUser(current)
@@ -85,7 +86,7 @@ export function App() {
   return (
     <main className="card">
       <h1>{copy.appTitle}</h1>
-      <nav aria-label="auth mode">
+      <nav aria-label={copy.navLabel}>
         <button type="button" onClick={() => { setMode('login'); setError(null); setNotice(null) }} aria-pressed={mode === 'login'}>
           {copy.tabLogin}
         </button>

@@ -5,6 +5,7 @@
 
 export const copy = {
   appTitle: 'dsh-dev-kit',
+  navLabel: '登录 / 注册',
   tabLogin: '登录',
   tabRegister: '注册',
   emailLabel: '邮箱',

@@ -16,6 +16,7 @@ export interface AppConfig {
   /** Token expiry passed through to jsonwebtoken, e.g. '15m', '1h'. */
   jwtTtl: string
   port: number
+  /** Enable the Fastify logger; request-scoped logs then carry the request id. */
   logger: boolean
 }
 
@@ -34,6 +35,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     jwtSecret,
     jwtTtl: env.JWT_TTL ?? DEFAULT_JWT_TTL,
     port,
-    logger: false,
+    logger: true,
   }
 }
