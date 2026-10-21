@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
+    "rootDir": ".",
+    "types": ["node"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "paths": {
+      "@devkit/shared": ["./packages/shared/lib/index.d.ts"]
+    }
+  },
+  "include": ["apps/*/src/**/*.ts"]
+}

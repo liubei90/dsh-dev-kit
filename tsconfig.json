@@ -1,8 +1,22 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./apps/api" },
-    { "path": "./apps/web" },
-    { "path": "./packages/shared" }
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
+    "rootDir": ".",
+    "types": ["node"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "allowImportingTsExtensions": true
+  },
+  "include": [
+    "apps/*/src/**/*.ts",
+    "apps/*/tests/**/*.ts",
+    "packages/*/src/**/*.ts",
+    "packages/*/tests/**/*.ts",
+    "scripts/**/*.ts",
+    "*.config.ts"
   ]
 }

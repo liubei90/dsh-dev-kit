@@ -1,0 +1,5 @@
+# The repository's canonical text form is LF, enforced at checkout: the gates
+# compare bytes (archive seal hashes, document budget units), so every host must
+# see one form. Windows command scripts keep CRLF for cmd.exe.
+* text=auto eol=lf
+*.cmd text eol=crlf

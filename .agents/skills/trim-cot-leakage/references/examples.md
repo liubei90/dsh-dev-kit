@@ -1,6 +1,6 @@
 # Few-shot leakage examples
 
-Distilled from the 2026-08 repo-wide purge and its review rounds. Use them to identify the governing principle, not as text templates. This file deliberately quotes leaked wording as calibration material — the [recall batteries](recall-batteries.md) exclude the skill's directory, and its wording is not a license elsewhere.
+Distilled from a repo-wide purge of leaked reasoning prose and its review rounds. Use them to identify the governing principle, not as text templates. This file deliberately quotes leaked wording as calibration material — the [recall batteries](recall-batteries.md) exclude the skill's directory, and its wording is not a license elsewhere.
 
 ## Dead citations
 
@@ -8,9 +8,9 @@ Distilled from the 2026-08 repo-wide purge and its review rounds. Use them to id
 
 **Leaked:** "Slash input resolves against the visible catalog (decision 21)."
 
-**Fixed:** "Slash input resolves against the visible catalog — the plain-text-reference decision, owned by the corresponding Agent Note under `.agents/notes/implemented/`."
+**Fixed:** "Slash input resolves against the visible catalog; the input-resolution Agent Note owns why the catalog is visible."
 
-The ordinal resolves nowhere at HEAD; the decision's name and owning note path do. Name the owning note's path at least once per file — as a link where the surface supports one — and later mentions may use the searchable name alone.
+The ordinal resolves nowhere at HEAD; the decision's name and owning Agent Note path do. Name the owning note's path at least once per file — as a link where the surface supports one — and later mentions may use the searchable name alone.
 
 ### Decision ordinal without an owner
 
@@ -22,11 +22,11 @@ No committed artifact owns "decision 7", so the citation is deleted — but its 
 
 ### Audit item codes
 
-**Leaked:** "Rendering is pure: same snapshot, same string (audit R3)."
+**Leaked:** "Rendering is pure: same input, same string (audit R3)."
 
-**Fixed:** "Rendering is pure: same snapshot, same string."
+**Fixed:** "Rendering is pure: same input, same string."
 
-There is no audit document in the repo; the code is pure session shorthand carrying zero propositions.
+There is no audit document in the repo; the code is a pure formatter carrying zero propositions.
 
 ### Section numbers of uncommitted drafts
 
@@ -38,9 +38,9 @@ There is no audit document in the repo; the code is pure session shorthand carry
 
 ### Plan-phase labels
 
-**Leaked:** "`src/client/` is the shell (T4); the P-I migration owns the adapters."
+**Leaked:** "`src/web/` is the shell (T4); the P-I migration owns the adapters."
 
-**Fixed:** "`src/client/` is the shell; the adapters live in `src/client/adapters/`."
+**Fixed:** "`src/web/` is the shell; the adapters live in `src/web/adapters/`."
 
 Phase labels index a plan that never landed. Replace the label with what the phase produced.
 
@@ -48,17 +48,17 @@ Phase labels index a plan that never landed. Replace the label with what the pha
 
 ### Stack position in durable prose
 
-**Leaked:** "A future remote backend implements this interface (the sandbox backend is a later PR in this stack)."
+**Leaked:** "A future remote client implements this interface (the HTTP client is a later PR in this stack)."
 
-**Fixed:** "A remote backend can implement this interface without changing the render layer."
+**Fixed:** "A remote client can implement this interface without changing the render layer."
 
 Durable prose cannot see the stack. Keep the extension-point contract; the pending work's home is the PR itself, a `TODO`, or an issue.
 
 ### "This PR" in a README
 
-**Leaked:** "This PR adds cursor-based pagination to the session list."
+**Leaked:** "This PR adds cursor-based pagination to the order list."
 
-**Fixed:** "The session list paginates by cursor."
+**Fixed:** "The order list paginates by cursor."
 
 A README outlives every PR; state the mechanism as current fact.
 
@@ -102,7 +102,7 @@ The regression pin survives as a present-tense counterfactual that names the gua
 
 **Leaked:** "Rejected in review: caching the resolved spec. We keep resolution per-call."
 
-**Fixed (in an Agent Note's Alternatives considered):** "**Caching the resolved spec.** Rejected: the spec depends on per-call cwd, so a cache keyed by request would serve stale roots."
+**Fixed (in an Agent Note's Alternatives considered):** "**Caching the resolved spec.** Rejected: the spec depends on per-call `cwd`, so a cache keyed by request would serve stale roots."
 
 The alternatives-considered genre is the sanctioned home; the reviewer and the round are not part of the rationale.
 
@@ -144,9 +144,9 @@ The three lines below the comment say the same thing in code.
 
 ### Test walkthrough
 
-**Leaked:** "This test creates a session, sends two messages, waits for the second reply, and then asserts the log has four entries."
+**Leaked:** "This test creates an order, posts two items, waits for the second response, and then asserts the table has four rows."
 
-**Fixed:** "Two round-trips must produce exactly four log entries — the projection dedupes the shared prefix."
+**Fixed:** "Two round-trips must produce exactly four rows — the projection dedupes the shared prefix."
 
 Keep only the non-obvious assertion rationale; the walkthrough restates the test body.
 
@@ -170,27 +170,29 @@ Replace the hedge with the actual bound and the failure behavior when it is exce
 
 ## Authoring-language slips
 
+### Chinese fragment inside English code prose
+
 **Leaked:** "The renderer runs on the client 端; see the 设计稿 for spacing. ---- 私有 ----"
 
-**Fixed:** "The renderer runs on the client side; spacing follows the Figma frame `widget-badges`."
+**Fixed:** "The renderer runs on the client side; spacing follows the shared spacing tokens."
 
-Working-language fragments and session separators are transcription residue. The Figma frame name stays: external provenance that resolves outside the repo by design.
+Working-language fragments and private separators are transcription residue. Code, JSDoc, and diagnostics are English; the Chinese explanation belongs in the documentation that owns the behavior.
 
-### Authoring-language slip inside a paired fence
+### Authoring-language slip inside a fenced block
 
-**Leaked in both files:** `// 更新这里 before returning` inside a verbatim code block.
+**Leaked:** `// 更新这里 before returning` inside a verbatim code block.
 
-**Fixed in both files:** `// Update this before returning.`
+**Fixed:** `// Update this before returning.`
 
-Correct the block once and copy that byte-exact fence into both language files. Translating the code comment differently in the Chinese counterpart breaks the pairing contract even when both comments are individually fluent.
+A fence quotes code, so its comment follows the code's language. Put the Chinese explanation in the prose around the block instead.
 
 ## Behavior-visible candidates
 
-**Suspect:** An exported JSDoc sentence says "available for now," and a generator copies that sentence into a model-visible catalog.
+**Suspect:** An exported JSDoc sentence says "available for now," and a generator copies that sentence into a generated API reference.
 
-**Wrong:** Rewrite only the source sentence during a prose-only purge, or hand-edit only the generated catalog.
+**Wrong:** Rewrite only the source sentence during a prose-only purge, or hand-edit only the generated reference.
 
-**Right:** Trace the source's generated fan-out, update the owner, regenerate every derivative, and update the owning runnable snapshot. For a GUI string, include the repository-required behavior evidence. If the authorized scope has no owning scenario, leave the wording unchanged and report the deferral.
+**Right:** Trace the source's generated fan-out, update the owner, regenerate every derivative, and update the owning expected-output test. For user-facing copy, include the owning behavior evidence. If the authorized scope has no owning scenario, leave the wording unchanged and report the deferral.
 
 ## Keeps
 
@@ -228,7 +230,7 @@ The measurement pins the constant against uninformed retuning, and "measured" is
 
 **Keep:** "What is today's date?"
 
-The prompt asks about the runtime clock; "today" does not contrast repository states. Because the text reaches a model, any rewrite still requires its owning behavior evidence.
+The prompt asks about the runtime clock; "today" does not contrast repository states. Because the text reaches a user, any rewrite still requires its owning behavior evidence.
 
 ## Overcorrection traps
 
@@ -236,39 +238,39 @@ Every trap below shipped in the original purge and was caught in review. Enumera
 
 ### Flipping an obligation into an endorsement
 
-**Original:** "These direct registrations are exceptions pending migration to slots."
+**Original:** "These direct route registrations are exceptions pending migration to the shared router."
 
-**Overcorrected:** "These direct registrations are sanctioned exceptions."
+**Overcorrected:** "These direct route registrations are sanctioned exceptions."
 
-**Right:** "These direct registrations are exceptions pending migration to slots."
+**Right:** "These direct route registrations are exceptions pending migration to the shared router."
 
 "Pending migration" is an obligation; "sanctioned" blesses the status quo. The trim inverted the sentence's modality while shortening it.
 
 ### Promoting a hypothetical to a shipped feature
 
-**Original:** "A future IPC-based shell subclasses the executor and overrides `spawn`."
+**Original:** "A future queue-backed worker reuses the executor and overrides `spawn`."
 
-**Overcorrected:** "An IPC-based shell subclasses the executor and overrides `spawn`."
+**Overcorrected:** "A queue-backed worker reuses the executor and overrides `spawn`."
 
-**Right:** "A hypothetical IPC-based shell — no such shell exists — would subclass the executor and override `spawn`."
+**Right:** "A hypothetical queue-backed worker — no such worker exists — would reuse the executor and override `spawn`."
 
 Deleting the future-marker alone turns a design illustration into a claim that the class ships. Mark the hypothetical explicitly instead of just unmarking the future.
 
 ### Deleting a true fact with the transcript around it
 
-**Original:** "The gate notice narrates the check order; the notice text is also what `verify-doc-typecheck` compiles against."
+**Original:** "The gate notice narrates the check order; the notice text is also what the CLI expected-output test pins."
 
 **Overcorrected:** "…" (whole sentence deleted as narration.)
 
-**Right:** "The notice text is what `verify-doc-typecheck` compiles against."
+**Right:** "The notice text is what the CLI expected-output test pins."
 
 Half the sentence was narration; the other half was a load-bearing coupling. Delete clauses, not sentences, when propositions share a line.
 
 ### Dropping provenance while keeping the number
 
-**Original:** "The 4 MiB ceiling is measured: the largest generated `py-types` module is 3.1 MiB."
+**Original:** "The 4 MiB ceiling is measured: the largest generated module is 3.1 MiB."
 
-**Overcorrected:** "The ceiling is 4 MiB; the largest generated `py-types` module is 3.1 MiB."
+**Overcorrected:** "The ceiling is 4 MiB; the largest generated module is 3.1 MiB."
 
 **Right:** keep "measured".
 

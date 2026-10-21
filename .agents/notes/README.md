@@ -1,61 +1,60 @@
 # Agent Notes
 
-One kind of design doc lives here. An **Agent Note** records a decision or proposal that affects this codebase — the *why* and *what we gave up*, the parts code and docs can't carry. This file defines where Agent Notes live, when to write one, and [the in-file format](#the-file-format). (A bilingual `.zh.md` counterpart is optional; add one only when the project enables bilingual documentation.)
+这里放的是一种设计文档。**Agent Note** 记录影响本代码库的决策或提案——代码和文档承载不了的"为什么"与"放弃了什么"。本文件定义笔记放在哪里、什么时候写、以及[文件格式](#文件格式)。
 
-## Layout and naming
+## 布局与命名
 
-Every Agent Note has two axes, both encoded in its **path** — `{lifecycle}/{class}/yyyy-mm-dd-topic-title.md`:
+每篇笔记的两个维度都编码在**路径**里：`{lifecycle}/{class}/yyyy-mm-dd-topic-title.md`。
 
-- **Lifecycle** (the top-level folder) is the Agent Note's status, and an Agent Note moves between folders as that status changes:
-  - **`proposed/`** — proposals reviewed before implementation; not yet built (or only partly).
-  - **`implemented/`** — the decision shipped. The file records what was decided and what was rejected, and is **kept current with what actually shipped**: when the code later moves a file, renames a package, or changes a key/default, the Agent Note is updated in the same change to match (facts only — paths, names, structure — not the decision itself). See [implemented/AGENTS.md](implemented/AGENTS.md).
-  - **`rejected/`** — the proposal was considered and declined. Keep it only while its rationale prevents a tempting, meaningful mistake; otherwise delete the complete triplet.
-- **Class** (the nested folder) is the *kind* of decision — see [Classification](#classification) below.
+- **生命周期**（顶层目录）就是笔记的状态，状态变化时笔记在目录之间移动：
+  - **`proposed/`** —— 实现前评审的提案，尚未建成（或只建成一部分）。
+  - **`implemented/`** —— 决策已交付。文件记录决定了什么、否决了什么，并**与真实交付保持同步**：代码后来移动了文件、改了名字或默认值时，在同一次变更里更新笔记以匹配（只改事实——路径、名字、结构——不改决策本身）。见 [implemented/AGENTS.md](implemented/AGENTS.md)。
+  - **`rejected/`** —— 提案被考虑并否决。只在它的理由还能阻止一个诱人且重要的错误时保留，否则连同文件一起删除。
+  - **`archived/`** —— 不再指导后续工作的已交付笔记，冻结保存。见[归档与删除](#归档与删除)。
+- **分类**（下一层目录）是决策的**种类**，见下面的[分类](#分类)。
 
-The date in the filename is when the topic was **first proposed** (per git history). Cross-references between Agent Notes use relative markdown links (`[topic](../../implemented/architecture/2026-…-….md)`) — never bare prose or numbers — so they are mechanically checkable and survive moves between folders.
+文件名里的日期是主题**首次提出**的日期。笔记之间的交叉引用用相对 Markdown 链接，不要用裸散文或编号——这样机器可校验，也能在目录移动后存活。
 
-The active lifecycle tree is the working inventory: browse its lifecycle/class folders or search the repository. Do not add a centralized `INDEX.md`; an Agent Note records the rationale. Low-future-value implemented records move to the separate frozen [`archived/`](archived/AGENTS.md) tree described below.
+活跃树本身就是工作清单：浏览它的生命周期/分类目录，或在仓库里搜索。**不要**新增集中的 `INDEX.md`；`scripts/agent-note-tree.ts` 是生命周期与分类封闭集的唯一来源，`pnpm run verify-agent-note-classification` 拒绝未知目录、错误的目录深度、不合规的文件名与 `INDEX.md`。
 
-## Classification
+## 分类
 
-Each Agent Note belongs to one path-encoded class from the closed set in `scripts/agent-note-tree.ts`; the classification gate rejects other folders. Adding a class requires updating the canonical set and this section.
+每篇笔记属于下面封闭集里的一个分类；`scripts/agent-note-tree.ts` 是权威声明处。新增一个分类要同时更新该文件与本表。
 
-| Class | What it covers |
+| 分类 | 覆盖什么 |
 |---|---|
-| `feature` | A new user- or model-facing capability. |
-| `bug-fix` | Corrects a defect or closes a gap a postmortem surfaced. |
-| `simplification` | Removes code, behavior, or surface area without adding a capability. |
-| `architecture` | A structural decision about the **shipped source** — how packages relate, what the runtime vocabulary is. |
-| `process` | Tooling, policy, or workflow **around** the code — gates, the package manager, vendoring — not runtime behavior. |
-| `testing` | Test infrastructure and strategy. |
+| `feature` | 新的用户可见或对外可见的能力。 |
+| `bug-fix` | 修正缺陷，或补上某个复盘暴露的缺口。 |
+| `simplification` | 删除代码、行为或对外表面，而不新增能力。 |
+| `architecture` | 关于**已交付源码**的结构性决策——模块之间怎么关联、运行时词汇是什么。 |
+| `process` | 代码**周边**的工具、政策或流程——门禁、包管理器、依赖策略——而不是运行时行为。 |
+| `testing` | 测试基础设施与策略。 |
 
-The `architecture` / `process` line: **architecture** is about the source we ship; **process** is the surrounding tooling and workflow. (`refactor` is deliberately absent — it overlaps `simplification`, whose discriminator, "does observable behavior change?", already covers it.)
+`architecture` 与 `process` 的界线：**architecture** 说的是我们交付的源码，**process** 说的是周边工具与工作流。分类里刻意没有 `refactor`——它与 `simplification` 重叠，后者的判别标准"可观察行为是否改变"已经覆盖了它。
 
-## Archiving and deletion
+## 归档与删除
 
-Archive an implemented Agent Note when the shipped decision is complete and its rationale is unlikely to guide future work. Keep it active when its alternatives, ownership boundary, negative guarantee, durable or wire semantics, security rule, or reintroduction condition remains useful. Never archive a proposed note: reject an obsolete proposal. Keep a rejected note only while it prevents a plausible mistake; otherwise delete its English, Chinese, and sidecar files together. Use calibrated judgment rather than word count, age, or a target quota.
+当已交付决策已经完成、且它的理由不太可能再指导后续工作时归档该笔记。当它的备选方案、所有权边界、否定性保证、持久或线上语义、安全规则、或重新引入的条件仍然有用时，保持它活跃。**永不归档 proposed 笔记**：过时的提案应该被否决。rejected 笔记只在还能阻止一个可信错误时保留，否则删除。用校准过的判断，而不是字数、年龄或配额。
 
-The archive is path-encoded as `archived/{class}/yyyy-mm-dd-topic-title.md`; `implemented` is deliberately absent because only implemented notes can enter it. An archival change moves the complete English/Chinese/sidecar triplet, retains `Status: implemented`, inserts the same `Archived: YYYY-MM-DD` line immediately below that status in both language files, re-records the sidecar, and repairs or deletes inbound links. These are the only permitted content changes during archival.
+归档路径是 `archived/{class}/yyyy-mm-dd-topic-title.md`；刻意没有 `implemented` 这一层，因为只有已实现笔记能进入归档。归档变更只允许：移动笔记文件、在 `Status: implemented` 行下方插入 `Archived: YYYY-MM-DD` 行、重录清单哈希、修复或删除入站链接。
 
-Once sealed, every archived triplet is permanently frozen. Do not edit, translate, reformat, update, move, or delete it, and do not treat it as authority for current behavior. Documentation gates skip archived sources, including their outbound links; active prose may still link into an archived note when it intentionally cites history. `verify-archived-agent-notes` enforces the closed class tree, complete triplets, archive metadata, sidecar hashes, and the append-only frozen-content manifest.
+一旦封存，归档笔记永久冻结：不要编辑、翻译、重排、更新、移动或删除它，也不要把它当作当前行为的依据。文档门禁跳过归档文件作为**源**（包括它们的出站链接）；活跃散文仍可链接进归档笔记以引用历史。`scripts/verify-archived-agent-notes.ts` 强制执行封闭分类树、归档元数据与只追加的封存清单：已登记的哈希永不改写，`--write` 只追加新文件且同样受校验错误阻断。归档流程见 [archive-agent-notes](../skills/archive-agent-notes/SKILL.md)。
 
-## When to write one
+被完全取代的已实现笔记可以合并进当前持有该决策的笔记并删除。删除前，持有者必须保留下每一份独有理由、备选方案、后果、所需验证与已命名的覆盖缺口；修复所有入站链接；并在同一次变更里删除该文件。部分取代不适用：保持两篇笔记互相链接，并更新其中每个仍然成立的事实。合并不得把旧文件改写成它的反面，也不得把 git 历史当成理由的唯一副本。
 
-Every non-trivial change MUST add or update at least one Agent Note in the same PR. A change is non-trivial when it alters behavior, architecture, a contract shared across files or packages, process or tooling, testing strategy, an on-disk, wire, or configuration format, or another decision a maintainer may reasonably revisit. A proposal for substantial future work starts in `proposed/`; a decision already made starts in `implemented/`. Pick the class folder that matches the decision (see [Classification](#classification)).
+## 何时写一篇
 
-Updating the Agent Note that already owns the decision satisfies the rule; do not create a duplicate. Only a purely mechanical or local edit with no change to behavior, contracts, structure, process, or rationale is exempt. An Agent Note is never edited into a *different decision*: supersede it with a new one, and keep both notes cross-linked unless the old note is later fully consolidated under the rule below. Editing an `implemented/` Agent Note to track where its existing decision lives is required, not forbidden; see [implemented/AGENTS.md](implemented/AGENTS.md).
+每个非平凡变更**必须**在同一个 PR 里新增或更新至少一篇 Agent Note。变更属于非平凡，当它改变行为、架构、跨文件或跨包的契约、流程或工具、测试策略、磁盘/线上/配置格式，或任何维护者可能合理重新审视的决策。实质性的未来工作从 `proposed/` 开始；已经做出的决策直接从 `implemented/` 开始。选择与决策相符的分类目录。
 
-An implemented Agent Note that is fully superseded may be consolidated into the current owning note and deleted. Before deletion, the owner must preserve every unique rationale, alternative, consequence, required verification, and named coverage gap; repair every inbound link; and delete the Chinese counterpart and consistency record in the same change. Partial supersession does not qualify: keep both notes cross-linked and update every fact that remains current. Consolidation must not rewrite the old file into its opposite or rely on git history as the only copy of rationale.
+更新已经持有该决策的笔记就算满足这条规则，不要制造重复。只有纯机械或局部、且不改变行为、契约、结构、流程或理由的编辑才豁免。**不要把一篇笔记编辑成另一个决策**：用新笔记取代它，并让两篇互相链接，除非旧笔记之后被完全合并。把已实现笔记编辑成"它的决策现在住在哪里"是必须做的事，不是禁止的事；见 [implemented/AGENTS.md](implemented/AGENTS.md)。
 
-A feature-addition note may be consolidated into the later removal note only when the feature is absent from production code, configuration, schemas, durable or wire formats, migration, and compatibility behavior; no current documentation presents it as available; and no test exercises it as supported behavior. Removal rationale and tests that verify absence may remain. The removal owner preserves the original motivation, why it no longer justified the feature, alternatives to full removal, the capability given up, conditions for reintroduction, and verification of complete absence. Obsolete implementation inventories and tests that only verified the deleted behavior are not current verification evidence. Removing one transport, default, implementation, or presentation is partial supersession, as is any surviving durable data or compatibility handling.
+## 文件格式
 
-## The file format
+每篇活跃笔记遵循同一套文件内格式，由 `pnpm run verify-agent-note-format`（属于 `doc-sync`）强制。归档笔记保留封存时的格式，外加状态行下方的归档日期行。
 
-Every active Agent Note follows one in-file format, enforced by `pnpm run verify-agent-note-format` (part of `doc-sync`). Archived notes retain the format they had when sealed plus the archive-date line above.
+### 头部块
 
-### The header block
-
-The first three lines of every Agent Note are exactly:
+每篇笔记的前三行必须恰好是：
 
 ```markdown
 # Agent Note: <title>
@@ -63,61 +62,61 @@ The first three lines of every Agent Note are exactly:
 Status: <status>
 ```
 
-followed by a blank line. The `Status:` value is one of three forms, and must agree with the lifecycle folder the file sits in — the gate cross-checks them:
+`Status:` 只有三种取值，并且必须与文件所在的生命周期目录一致（门禁会交叉校验），全文件只允许出现一次 `Status:` 行：
 
 - `Status: proposed`
 - `Status: implemented`
-- `Status: rejected — <why, in one line>`
+- `Status: rejected — <一句话原因>`
 
-The status carries no dates and no parentheticals: the filename holds the first-proposed date, git holds everything else, and an "accepted in amended form" note is body content (state the amendment where the decision is stated). The rejection reason is the one status with content, because a rejected Agent Note's verdict is the fact readers come for.
+状态不带日期也不带括号补充：文件名承载首次提出日期，git 承载其余一切。拒绝原因是唯一带内容的状态，因为读者来看的就是这篇笔记的裁决。
 
-### The body skeleton
+### 正文骨架
 
-Every Agent Note opens its body with `## Problem` — the motivation, written to stand without the solution. What follows depends on the lifecycle; recurring sections use these canonical names and nothing else, while genuinely bespoke technical sections (package topology, wire contracts, schemas) remain free-form between the required ones.
+每篇笔记的正文以 `## Problem` 开头——动机，要能脱离解决方案独立成立。之后的内容取决于生命周期；重复出现的章节使用下面这些规范名字，除此之外不要自创同级标题，真正属于本主题的技术章节（模块拓扑、线上契约、数据库 schema）可以在必需章节之间自由书写。
 
 #### `proposed/`
 
 ```markdown
 ## Problem
 ## Proposal
-…bespoke sections…
+…本主题特有章节…
 ## Alternatives considered
 ## Acceptance criteria
 ## Risks
 ```
 
-`## Proposal` is the intended change and may legitimately speak in the future tense — plans, migration steps, and open questions belong here while the work is unbuilt. `## Acceptance criteria` says what observable state means done. `## Risks` covers both what could go wrong and what the change knowingly gives up.
+`## Proposal` 是打算做的改动，在尚未建成时可以用将来时——计划、迁移步骤与开放问题都属于这里。`## Acceptance criteria` 说明什么样的可观察状态算完成。`## Risks` 同时覆盖可能出错的地方与这次改动明知要放弃的东西。
 
 #### `implemented/`
 
 ```markdown
 ## Problem
 ## Decision
-…bespoke sections…
+…本主题特有章节…
 ## Alternatives considered
 ## Consequences
 ```
 
-`## Decision` describes shipped reality in the present tense, and the whole file is kept current with it per [implemented/AGENTS.md](implemented/AGENTS.md). `## Consequences` records what the trade-off cost **and** bought. Proposal-era headings are spec-speak here and the gate rejects them: `## Proposal`, `## Plan`, `## Migration plan`, and `## Acceptance criteria` may not appear in an implemented Agent Note (the [slop checklist](../../docs/AGENTS.md) names why). A `## Testing`, `## Deferred`, or `## Related` section is fine where it states present-tense fact.
+`## Decision` 用现在时描述已交付的现实，整篇文件按 [implemented/AGENTS.md](implemented/AGENTS.md) 与它保持同步。`## Consequences` 记录这次取舍**付出**了什么、**换来**了什么。提案期的标题在这里属于 spec-speak，门禁会拒绝：`## Proposal`、`## Plan`、`## Migration plan`、`## Acceptance criteria` 不得出现在已实现笔记里。`## Testing`、`## Deferred`、`## Related` 这类章节在陈述现在时事实时是允许的。
 
 #### `rejected/`
 
-A rejected Agent Note is the proposal, frozen: it keeps whatever proposal-time sections it had (including `## Acceptance criteria` or `## Plan`), and the verdict lives on the `Status:` line. Only the header block, the `## Problem` opener, a `## Proposal` section, and the Alternatives-considered mandate below apply.
+被拒绝的笔记就是被冻结的提案：保留它提案期拥有的章节（包括 `## Acceptance criteria` 或 `## Plan`），裁决写在 `Status:` 行上。只有头部块、`## Problem` 开头、`## Proposal` 章节与下面强制的备选方案条款适用。
 
-### Alternatives considered — mandatory
+### Alternatives considered 必填
 
-Every Agent Note carries an `## Alternatives considered` section: each genuine alternative and why it lost, one bold-led paragraph per alternative or a `### Why not <X>?` subsection per contested one. A decision recorded without what it beat invites re-litigation — the failure Agent Notes exist to prevent.
+每篇笔记都要有 `## Alternatives considered` 章节：每个真实备选方案以及它为什么落选，一个备选一段（用粗体领起），争议大的可以用 `### 为什么不选 <X>?` 小节。没有记录打败过什么的决策，会招来反复重提——这正是 Agent Notes 要防止的失败。
 
-Alternatives are recorded, never invented. An Agent Note dated before 2026-07-05 whose alternatives are not reconstructible from the record carries this exact comment in place of the section, which the gate accepts for pre-format files only:
+备选方案是**记录**出来的，不是发明出来的。2026-07-05 之前的历史笔记如果无法从记录中重建备选方案，可以用下面这行精确注释代替该章节；门禁只对格式生效前的笔记接受它：
 
 ```markdown
 <!-- agent-note-format: alternatives-not-recorded (pre-format Agent Note) -->
 ```
 
-### Moving between lifecycles
+### 在生命周期之间移动
 
-Moving a file between lifecycle folders means updating the `Status:` line and re-satisfying that folder's skeleton in the same change — the gate fails the move otherwise. Concretely, `proposed/` → `implemented/` rewrites `## Proposal` into a present-tense `## Decision`, folds `## Acceptance criteria` and `## Risks` into `## Consequences` (or a present-tense `## Testing`/`## Verification` section for what now pins the behavior), and drops plans in favor of what shipped — the rewrite [implemented/AGENTS.md](implemented/AGENTS.md) requires, made mechanical. `proposed/` → `rejected/` only adds the reason to the `Status:` line and freezes the file.
+在生命周期目录之间移动文件意味着在同一次变更里更新 `Status:` 行并重新满足目标目录的骨架，否则门禁会让这次移动失败。具体地说，`proposed/` → `implemented/` 要把 `## Proposal` 改写成现在时的 `## Decision`，把 `## Acceptance criteria` 与 `## Risks` 折叠进 `## Consequences`（或一个现在时的 `## Testing`/`## Verification` 章节，用于记录现在钉住该行为的东西），并删掉计划、只留已交付的内容。`proposed/` → `rejected/` 只需在 `Status:` 行加上原因，然后冻结文件。
 
-### Chinese counterparts
+### 语言
 
-A `.zh.md` counterpart mirrors its English sibling's structure section-for-section under the repository's bilingual i18n contract (optional; see docs/i18n/README.md); the machine-checked header tokens (`# Agent Note: ` and the `Status:` line) stay in English verbatim. The format gate skips `.zh.md` files — the pairing gate checks their consistency.
+笔记用中文写作。机器可读的标记保持英文原样：`# Agent Note: ` 前缀与 `Status:` 行。

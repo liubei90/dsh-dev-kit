@@ -1,8 +1,12 @@
 {
   "compilerOptions": {
     "target": "ES2022",
+    "lib": ["ES2022"],
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
+    "paths": {
+      "@devkit/shared": ["./packages/shared/src/index.ts"]
+    },
     "strict": true,
     "noImplicitAny": true,
     "noUncheckedIndexedAccess": true,

@@ -1,4 +1,14 @@
 {
-  "AGENTS.md": 1600,
-  "docs/AGENTS.md": 1400
+  "README.md": 900,
+  "AGENTS.md": 2300,
+  "docs/AGENTS.md": 1870,
+  "docs/architecture.md": 510,
+  "docs/development.md": 750,
+  "docs/testing.md": 630,
+  "docs/defensive-patterns/README.md": 640,
+  "docs/defensive-patterns/general.md": 990,
+  "docs/defensive-patterns/server-and-api.md": 840,
+  "docs/defensive-patterns/client-components.md": 800,
+  "docs/defensive-patterns/shared-contracts.md": 740,
+  ".agents/notes/README.md": 2930
 }

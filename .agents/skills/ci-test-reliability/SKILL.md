@@ -1,6 +1,6 @@
 ---
 name: ci-test-reliability
-description: Design, review, and diagnose tests and fixtures that can fail nondeterministically under CI concurrency, shared host resources, clocks, process-global state, subprocesses, network listeners, or asynchronous teardown. Use when adding or changing tests with those risks, investigating flaky CI, or reviewing test isolation; use pre-push-checks separately to select outgoing commands.
+description: 'Design, review, and diagnose tests and fixtures that can fail nondeterministically under CI concurrency, shared host resources, clocks, process-global state, subprocesses, network listeners, or asynchronous teardown. Use when adding or changing tests with those risks, investigating flaky CI, or reviewing test isolation; use pre-push-checks separately to select outgoing commands.'
 ---
 
 # Reliable CI tests
@@ -9,9 +9,9 @@ Build tests that remain correct under the repository's real CI topology, not onl
 
 ## Read the owning rules
 
-- Use [the testing policy](../../../docs/testing.md) to select unit, coverage, integration, E2E, or real-provider evidence.
-- Use [the defensive patterns](../../../docs/defensive-patterns.md) for lifecycle, subprocess, cancellation, and teardown behavior.
-- Read the active Vitest config and GitHub workflow when their worker or job topology affects the test.
+- Use [the testing policy](../../../docs/testing.md) to select unit, coverage, integration, or E2E evidence.
+- Use [the defensive patterns](../../../docs/defensive-patterns/README.md) for lifecycle, subprocess, cancellation, and teardown behavior.
+- Read the active Vitest config and the CI workflow (`.github/workflows/ci.yml`) when their worker or job topology affects the test.
 - Use [pre-push-checks](../pre-push-checks/SKILL.md) after the test design is sound to select outgoing validation.
 
 ## Model the execution topology
@@ -21,7 +21,7 @@ Assume these layers can overlap unless the active configuration proves otherwise
 1. Tests in one Vitest file.
 2. Separate Vitest files or worker processes.
 3. Independent Vitest or repository-gate processes in one job.
-4. Different Actions jobs whose runners share one host.
+4. Different CI jobs whose runners share one host.
 
 Process isolation does not isolate host ports, predictable filesystem paths, external services, databases, sockets, or inherited child processes. For every acquired resource, identify its owner, atomic allocation mechanism, observable readiness signal, registered cleanup, and quiescent completion signal.
 
@@ -33,9 +33,9 @@ Use the resource owner's allocator instead of checking availability and claiming
 
 - Network fixtures bind loopback with `listen(0)` and read the assigned address only after the server reports that it is listening. Never scan for a free port and bind it later.
 - Create private per-test temporary roots with `mkdtemp`; do not acquire predictable shared paths.
-- Give shared databases, sockets, sessions, and output locations unique per-test namespaces.
+- Give shared databases, sockets, connections, and output locations unique per-test namespaces.
 - Use exclusive creation where a path must not already exist.
-- Keep stable recorded identifiers separate from ephemeral transport addresses. Translate inside the fixture instead of forcing the live resource to use the recorded value.
+- Keep stable fixture identifiers separate from ephemeral transport addresses. Translate inside the fixture instead of forcing the live resource to use the fixture value.
 
 Literal paths and URLs used only as parser inputs or expected values are not acquired resources. Do not rewrite them merely because they look fixed.
 
@@ -69,7 +69,7 @@ A `describe` or case timeout overrides the runner's `--testTimeout` instead of y
 
 Raise the hook budget with the test budget. Setup and teardown pay the same contention, so lifting only the case budget moves a contended failure into `afterEach`.
 
-Where a timeout is the subject, keep the outer wait far larger than the timeout under test. A case proving that a 20 ms deadline fires must not race the harness's own wait, or load decides which deadline reports first.
+Where a timeout is the subject, keep the outer wait far larger than the timeout under test. A case proving that a 20 ms deadline fires must not race the runner's own wait, or load decides which deadline reports first.
 
 ## Synchronize on state
 
@@ -110,7 +110,7 @@ Do not present these as root-cause fixes for deterministic local tests:
 - normalizing away unstable behavior;
 - adding a sleep before cleanup or assertion.
 
-Retries remain valid for documented transient external-provider tests under the real-API policy. Keep that exception at the external boundary.
+Retries remain valid for documented transient external-provider tests under the repository's E2E credential policy. Keep that exception at the external boundary.
 
 Restoring a budget is not masking. Raising a suite to the lane budget it already had, or sizing a bounded retry to the contention actually measured on the runner, names the awaited work and returns what the lane granted; neither invents headroom around an unexamined wait.
 

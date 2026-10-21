@@ -8,12 +8,18 @@ on:
 jobs:
   gates:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [22, 24]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
+        with:
+          version: 11.28.5
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: ${{ matrix.node-version }}
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm run lint
@@ -21,6 +27,9 @@ jobs:
       - run: pnpm run test
       - run: pnpm run doc-sync
       - run: pnpm run test:coverage
+      # Artifact plane: build output must match the package manifests, and
+      # consumers must typecheck against lib declarations, not only src paths.
+      - run: pnpm run build
 
   e2e:
     runs-on: ubuntu-latest
@@ -29,11 +38,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
+        with:
+          version: 11.28.5
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # Projects with credential-gated end-to-end tests declare their own
+      # secrets here; the config passes when a checkout has no e2e specs yet.
       - run: pnpm run test:e2e
-        env:
-          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}

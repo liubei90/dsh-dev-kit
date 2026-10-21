@@ -1,80 +1,118 @@
 /**
- * Verify the archived Agent Notes tree: complete frozen triplets, archive
- * metadata lines, and content hashes against manifest.json. Adapted from the
- * DeepSeek Harness gate (scripts/verify-archived-agent-notes.ts) under MIT.
+ * Verify and append-seal the frozen Agent Note archive (`{class}/yyyy-mm-dd-topic.md`).
+ * A missing manifest is treated as an empty archive; the Git baseline comparison still
+ * rejects removing or rewriting an entry that was already sealed. Ported from the
+ * DeepSeek Harness gate of the same name (MIT) with the bilingual triplet rules removed.
  */
 
-import { createHash } from 'node:crypto'
+import { spawnSync } from 'node:child_process'
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { AGENT_NOTE_CLASSES, agentNoteRoot } from './agent-note-tree.ts'
+import {
+  extendArchiveManifest,
+  parseArchiveManifest,
+  renderArchiveManifest,
+  validateArchiveArtifacts,
+  validateArchiveManifestExtension,
+  type ArchiveManifest,
+} from './archived-agent-notes.ts'
 
-const NOTES_ROOT = resolve(import.meta.dirname, '..', '.agents', 'notes')
-const ARCHIVED_ROOT = resolve(NOTES_ROOT, 'archived')
-const MANIFEST = resolve(ARCHIVED_ROOT, 'manifest.json')
-const CLASSES = ['feature', 'architecture', 'bug-fix', 'process', 'simplification', 'testing'] as const
-const WRITE = process.argv.includes('--write')
-
-interface Manifest { version: number; files: Record<string, string> }
-
-function sha256(file: string): string {
-  return `sha256:${createHash('sha256').update(readFileSync(file)).digest('hex')}`
+const args = process.argv.slice(2)
+const writeMode = args.length === 1 && args[0] === '--write'
+if (args.length > 0 && !writeMode) {
+  console.error('verify-archived-agent-notes: usage: tsx scripts/verify-archived-agent-notes.ts [--write]')
+  process.exit(1)
 }
 
-function loadManifest(): Manifest {
-  if (!existsSync(MANIFEST)) return { version: 1, files: {} }
-  return JSON.parse(readFileSync(MANIFEST, 'utf8')) as Manifest
-}
-
-const manifest = loadManifest()
+const archiveRoot = resolve(agentNoteRoot, 'archived')
+const manifestPath = resolve(archiveRoot, 'manifest.json')
+const repoRoot = resolve(agentNoteRoot, '../..')
+const manifestRepoPath = '.agents/notes/archived/manifest.json'
 const errors: string[] = []
-const current: Record<string, string> = {}
-const sealed: string[] = []
+const allowedRootFiles = new Set(['AGENTS.md', 'manifest.json'])
+const classes = new Set<string>()
 
-// 1. Verify every sealed artifact still matches and belongs to a complete triplet.
-for (const [rel, hash] of Object.entries(manifest.files)) {
-  const abs = resolve(ARCHIVED_ROOT, rel)
-  if (!existsSync(abs)) { errors.push(`sealed artifact missing: ${rel}`); continue }
-  const actual = sha256(abs)
-  if (actual !== hash) errors.push(`sealed artifact changed: ${rel}`)
-  else sealed.push(rel)
-  current[rel] = actual
-}
-
-// 2. Discover the archive tree; every triplet must be complete and sealed.
-for (const cls of CLASSES) {
-  const dir = resolve(ARCHIVED_ROOT, cls)
-  if (!existsSync(dir)) continue
-  for (const file of readdirSync(dir)) {
-    if (!file.endsWith('.md') && !file.endsWith('.yaml')) continue
-    const rel = `${cls}/${file}`
-    if (!(rel in manifest.files)) {
-      if (WRITE) current[rel] = sha256(resolve(ARCHIVED_ROOT, rel))
-      else errors.push(`unsealed archived artifact: ${rel}`)
+if (!existsSync(archiveRoot)) errors.push('archived/ is required')
+if (!existsSync(resolve(archiveRoot, 'AGENTS.md'))) errors.push('archived/AGENTS.md is required')
+const artifacts = new Map<string, Buffer>()
+if (existsSync(archiveRoot)) {
+  for (const entry of readdirSync(archiveRoot, { withFileTypes: true })) {
+    if (entry.isFile()) {
+      if (!allowedRootFiles.has(entry.name)) errors.push(`archived/${entry.name}: unexpected root file`)
+      continue
+    }
+    if (!entry.isDirectory()) {
+      errors.push(`archived/${entry.name}: only regular files and class directories are allowed`)
+      continue
+    }
+    if (!(AGENT_NOTE_CLASSES as readonly string[]).includes(entry.name)) {
+      errors.push(`archived/${entry.name}/: unknown Agent Note class`)
+      continue
+    }
+    classes.add(entry.name)
+    for (const child of readdirSync(resolve(archiveRoot, entry.name), { withFileTypes: true })) {
+      const rel = `${entry.name}/${child.name}`
+      if (!child.isFile()) {
+        errors.push(`${rel}: archived class directories contain regular files only`)
+        continue
+      }
+      artifacts.set(rel, readFileSync(resolve(archiveRoot, rel)))
     }
   }
 }
+errors.push(...validateArchiveArtifacts(artifacts))
 
-// 3. Metadata check: archived notes must carry `Archived:` under `Status: implemented`.
-for (const rel of Object.keys(current)) {
-  if (!rel.endsWith('.md') || rel.endsWith('.zh.md')) continue
-  const content = readFileSync(resolve(ARCHIVED_ROOT, rel), 'utf8')
-  const lines = content.split('\n')
-  if (lines[2] !== 'Status: implemented') errors.push(`${rel}: line 3 must be \`Status: implemented\``)
-  if (!/^Archived: \d{4}-\d{2}-\d{2}$/.test(lines[3] ?? '')) {
-    errors.push(`${rel}: line 4 must be \`Archived: YYYY-MM-DD\``)
+function runGit(gitArgs: string[]): string {
+  const result = spawnSync('git', gitArgs, { cwd: repoRoot, encoding: 'utf8' })
+  if (result.error !== undefined) throw result.error
+  if (result.status !== 0) throw new Error(result.stderr.trim() || `git exited with status ${result.status}`)
+  return result.stdout
+}
+
+function readBaselineManifest(ref: string): ArchiveManifest {
+  runGit(['cat-file', '-e', `${ref}^{commit}`])
+  const manifestEntry = runGit(['ls-tree', '--name-only', ref, '--', manifestRepoPath]).trim()
+  if (manifestEntry === '') return { version: 1, files: {} }
+  return parseArchiveManifest(runGit(['show', `${ref}:${manifestRepoPath}`]))
+}
+
+let manifest: ArchiveManifest = { version: 1, files: {} }
+if (existsSync(manifestPath)) {
+  try {
+    manifest = parseArchiveManifest(readFileSync(manifestPath, 'utf8'))
+  } catch (error: unknown) {
+    errors.push(`archived/manifest.json: ${error instanceof Error ? error.message : String(error)}`)
   }
 }
 
-if (WRITE) {
-  writeFileSync(MANIFEST, `${JSON.stringify({ version: 1, files: Object.fromEntries(Object.entries(current).sort()) }, null, 2)}\n`)
-  console.log(`verify-archived-agent-notes: sealed ${sealed.length} artifacts, recorded ${Object.keys(current).length} total.`)
-  process.exit(0)
+// CI supplies its trusted pre-change commit; local writes compare with committed HEAD.
+const baselineRef = process.env.KIT_ARCHIVE_BASE_REF ?? 'HEAD'
+try {
+  const baseline = readBaselineManifest(baselineRef)
+  errors.push(...validateArchiveManifestExtension(baseline, manifest))
+} catch (error: unknown) {
+  errors.push(`archived/manifest.json: cannot read baseline ${JSON.stringify(baselineRef)}: ${error instanceof Error ? error.message : String(error)}`)
 }
 
-if (errors.length === 0) {
-  console.log(`verify-archived-agent-notes: ${sealed.length} sealed artifact(s) verified.`)
-  process.exit(0)
+const extended = extendArchiveManifest(manifest, artifacts)
+errors.push(...extended.errors)
+if (!writeMode) {
+  for (const path of extended.added) errors.push(`${path}: archived artifact is not sealed in manifest.json`)
 }
-console.error('verify-archived-agent-notes: violations found:')
-for (const e of errors) console.error(`  ${e}`)
-process.exit(1)
+
+if (errors.length > 0) {
+  console.error('verify-archived-agent-notes: archive rules violated:')
+  for (const error of errors) console.error(`  ${error}`)
+  process.exit(1)
+}
+
+if (writeMode) {
+  const rendered = renderArchiveManifest(extended.files)
+  if (!existsSync(manifestPath) || readFileSync(manifestPath, 'utf8') !== rendered) {
+    writeFileSync(manifestPath, rendered)
+  }
+  console.log(`verify-archived-agent-notes: sealed ${extended.added.length} new artifact(s); existing seals unchanged.`)
+} else {
+  console.log(`verify-archived-agent-notes: ${artifacts.size} frozen artifact(s) checked across ${classes.size} class(es).`)
+}

@@ -1,56 +1,103 @@
 /**
- * Verify one physical line per paragraph outside code blocks, tables, and
- * lists. Adapted from the DeepSeek Harness gate (scripts/verify-md-wrap.ts).
+ * Reject Markdown prose paragraphs spanning multiple physical lines. The GFM
+ * AST distinguishes paragraphs—including those in lists and blockquotes—from
+ * multiline structural nodes (tables, code blocks, HTML blocks), so a table row
+ * or a fenced block may span lines while a prose paragraph may not. The checker
+ * never rewrites; symlinked instruction files are deduped. Frontmatter and
+ * custom-container delimiters are masked before parsing.
  */
 
-import { readdirSync, readFileSync, statSync } from 'node:fs'
-import { resolve, dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { readFileSync } from 'node:fs'
+import { relative, resolve } from 'node:path'
+import type { Nodes } from 'mdast'
+import { parseMarkdown, visitMarkdown } from './markdown.ts'
+import { isArchivedAgentNotePath, uniqueRepoFiles } from './repo-files.ts'
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+const root = resolve(import.meta.dirname, '..')
 
-function collectMarkdownFiles(dir: string, depth = 0): string[] {
-  if (depth > 6) return []
-  const out: string[] = []
-  for (const entry of readdirSync(dir)) {
-    if (entry === 'node_modules' || entry === '.git' || entry === 'lib' || entry === 'dist') continue
-    const abs = resolve(dir, entry)
-    const stat = statSync(abs)
-    if (stat.isDirectory()) out.push(...collectMarkdownFiles(abs, depth + 1))
-    else if (entry.endsWith('.md')) out.push(abs)
+/** Files to check: every authored documentation tree and the root instructions. */
+const PATTERNS = [
+  'README.md',
+  '.agents/notes/**/*.md',
+  '.agents/skills/**/*.md',
+  'docs/**/*.md',
+  'packages/**/*.md',
+  'AGENTS.md',
+]
+
+/**
+ * Path segments whose contents are never authored Markdown sources: installed
+ * dependencies and generated output.
+ */
+const EXCLUDED_DIRECTORIES = ['node_modules/', '.git/', 'lib/', 'dist/', 'coverage/']
+
+/** Whether a matched path lies under an excluded directory. */
+function isExcludedDirectory(relativePath: string): boolean {
+  const normalized = relativePath.replaceAll('\\', '/')
+  return EXCLUDED_DIRECTORIES.some(directory => normalized.startsWith(directory))
+}
+
+/** A located hard-wrap: a prose paragraph spanning more than one source line. */
+interface Violation {
+  file: string
+  /** 1-based line where the hard-wrapped paragraph starts. */
+  line: number
+  text: string
+}
+
+/**
+ * Blank out structural delimiters the parser would otherwise read as prose:
+ * a leading `---` frontmatter block and `:::` custom-container fences.
+ */
+function maskStructuralDelimiters(source: string): string {
+  const lines = source.split('\n')
+  if (lines[0] === '---') {
+    const closing = lines.indexOf('---', 1)
+    if (closing !== -1) {
+      for (let index = 0; index <= closing; index++) lines[index] = ''
+    }
   }
+  return lines.map(line => line.trimStart().startsWith(':::') ? '' : line).join('\n')
+}
+
+/** Find every hard-wrapped prose paragraph in one Markdown file via its AST. */
+function findViolations(absPath: string): Violation[] {
+  const file = relative(root, absPath)
+  const source = readFileSync(absPath, 'utf8')
+  const parsedSource = maskStructuralDelimiters(source)
+  const tree = parseMarkdown(parsedSource)
+  const out: Violation[] = []
+  const rawLines = source.split('\n')
+
+  visitMarkdown(tree, (node: Nodes): boolean | void => {
+    if (node.type === 'paragraph' && node.position) {
+      const { start, end } = node.position
+      if (end.line > start.line) {
+        const firstLine = rawLines[start.line - 1] ?? ''
+        out.push({ file, line: start.line, text: firstLine.trim() })
+      }
+      // Paragraph children are inline, so no further paragraph can be nested.
+      return false
+    }
+  })
   return out
 }
 
-const errors: string[] = []
-for (const file of collectMarkdownFiles(ROOT)) {
-  const lines = readFileSync(file, 'utf8').split('\n')
-  let inFence = false
-  let inFrontmatter = lines[0]?.trim() === '---'
-  let prevBlank = true
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i] ?? ''
-    if (inFrontmatter) {
-      if (i > 0 && line.trim() === '---') inFrontmatter = false
-      continue
-    }
-    if (line.startsWith('```')) { inFence = !inFence; prevBlank = false; continue }
-    if (inFence) continue
-    const trimmed = line.trim()
-    if (trimmed === '') { prevBlank = true; continue }
-    const isStructure = trimmed.startsWith('#') || trimmed.startsWith('|') || trimmed.startsWith('-') || trimmed.startsWith('*') || /^\d+\./.test(trimmed)
-    if (!isStructure && !prevBlank) {
-      errors.push(`${file}:${i + 1}: consecutive non-blank prose lines — one physical line per paragraph`)
-      break
-    }
-    prevBlank = isStructure
-  }
-}
+const files = uniqueRepoFiles(
+  root,
+  PATTERNS,
+  repoPath => isArchivedAgentNotePath(repoPath) || isExcludedDirectory(repoPath),
+)
+const all = files.flatMap(file => findViolations(file.abs))
+const checked = files.length
 
-if (errors.length === 0) {
-  console.log('verify-md-wrap: all prose wrapped one line per paragraph.')
+if (all.length === 0) {
+  console.log(`verify-md-wrap: ${checked} file(s) checked, no hard-wrapped prose paragraphs.`)
   process.exit(0)
 }
-console.error('verify-md-wrap: violations found:')
-for (const e of errors) console.error(`  ${e}`)
+
+console.error('verify-md-wrap: hard-wrapped prose paragraphs found (write one physical line per paragraph):')
+for (const v of all) {
+  console.error(`  ${v.file}:${v.line}  ${v.text.slice(0, 80)}${v.text.length > 80 ? '…' : ''}`)
+}
 process.exit(1)
