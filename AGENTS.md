@@ -20,7 +20,7 @@ scripts/       门禁与工具脚本
 ## Commands
 
 ```sh
-pnpm install            # pnpm workspaces,node ^22.19 || >=24;postinstall 自动安装 lefthook hooks
+pnpm install            # pnpm workspaces,node >=24.9;postinstall 自动安装 lefthook hooks
 pnpm run build          # build:artifacts + build:check
 pnpm run build:artifacts # tsc -b apps/api apps/web packages/shared:只产出 artifacts
 pnpm run build:check    # 读已有产物:校验包入口可加载,并把消费端按 lib 声明做类型检查
@@ -66,14 +66,14 @@ pnpm run change-scope --base <base>   # 本次 diff 范围;必须带 --base,否�
 **代码纪律**
 - strict TS(`strict`、`noImplicitAny`、`noUncheckedIndexedAccess`、`exactOptionalPropertyTypes`)下编译;每个 `any` 必须解释为何无法收窄。
 - 禁止新增 `as unknown` 断言(`as unknown` 或 `<unknown>`),也不要用 `as any` 绕过类型;替代写法用类型化值或在边界校验(`.oxlintrc.json` 已启用 `typescript/no-explicit-any` 等类型规则)。
-- 注册/订阅/连接/定时器/流必须有 teardown 并返回 disposer:disposer 幂等,创建者负责释放,进程重启与测试隔离下都必须可清理;生命周期、并发、子进程与异步 teardown 详见 [docs/defensive-patterns/general.md](docs/defensive-patterns/general.md)。
+- 注册/订阅/连接/定时器/流必须有 teardown 并返回 disposer:disposer 由注册面直接返回,或通过其文档化的注册句柄返回;disposer 幂等,创建者负责释放,进程重启与测试隔离下都必须可清理;生命周期、并发、子进程与异步 teardown 详见 [docs/defensive-patterns/general.md](docs/defensive-patterns/general.md)。
 - 共享状态挂在服务或实例上并指定主人:禁止新增模块级可变缓存、单例、`globalThis`/`window.__X__` 或 `Symbol.for` 旁路来隐藏主人;需要上下文时从当前作用域派生。
 - 无硬编码可调参数:部署差异进环境变量或配置,不写死在代码里。
 - 跨边界 id 用 branded type(如 `type UserId = string & { readonly __brand: 'UserId' }`),不用裸 string。
 - 信任类型化的同进程边界:跨进程、HTTP、DB、文件、队列与 worker 边界的值在边界做运行时校验;同进程类型化边界信任 TS,不为接口已保证的值添加运行时校验、兜底行为或敌意输入测试。
 - 每个事实只有一个家:同一条规则只陈述一次,其余改为链接(层级见 [docs/AGENTS.md](docs/AGENTS.md))。
 - 注释保持本地:不复述代码,不展开无关注释([prose-standard](.agents/skills/prose-standard/SKILL.md))。
-- 客户端 UI 文案走 i18n 字典,不硬编码进组件。
+- 客户端 UI 文案走 i18n 字典,不硬编码进组件;英文文案用 sentence case(只首词、专有名词与产品名大写,如 `Git worktrees`),中文按自身习惯。
 - 文件以单个尾随换行结尾;`git diff --cached --check`(pre-commit)把关。
 - 非平凡变更必须在同一 PR 附带 Agent Note;仅机械/局部编辑豁免,更新已拥有该决策的笔记即算([规则](.agents/notes/README.md)、[implemented 笔记](.agents/notes/implemented/AGENTS.md))。
 

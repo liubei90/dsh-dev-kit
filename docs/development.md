@@ -4,7 +4,7 @@
 
 ## 环境准备
 
-- Node.js `^22.19 || >=24`(见 [package.json](../package.json) 的 `engines.node`);启用 Corepack 的 pnpm,仓库锁定 `pnpm@11.28.5`。
+- Node.js `>=24.9`(见 [package.json](../package.json) 的 `engines.node`);启用 Corepack 的 pnpm,仓库锁定 `pnpm@11.28.5`。
 - `pnpm install` 安装依赖,并运行 `postinstall`([scripts/install-lefthook.mjs](../scripts/install-lefthook.mjs))配置 lefthook hooks。
 - hooks 缺失(依赖从缓存恢复,或安装时跳过了 `postinstall`)时,手动补救:
 
@@ -34,7 +34,7 @@ node scripts/install-lefthook.mjs
 
 [.github/workflows/ci.yml](../.github/workflows/ci.yml) 分两个 job:
 
-- `gates` 在 Node 22 与 24 上跑 `pnpm run lint`、`pnpm run typecheck`、`pnpm run test`、`pnpm run doc-sync`、`pnpm run test:coverage`、`pnpm run build`(含产物平面校验)。
+- `gates` 在 Node 24.9 与 26 上跑 `pnpm run lint`、`pnpm run typecheck`、`pnpm run test`、`pnpm run doc-sync`、`pnpm run test:coverage`、`pnpm run build`(含产物平面校验)。
 - `e2e` 只在 PR 上跑,执行 `pnpm run test:e2e`;没有凭据或尚无 e2e 用例时不会失败,因为 [vitest.e2e.config.ts](../vitest.e2e.config.ts) 设了 `passWithNoTests: true`,单个用例用 `describe.skipIf` 在自己依赖的环境缺失时跳过。
 
 `pnpm run check:all` 是本地全量(`doc-sync` + lint + typecheck + test + build)。hooks 只做秒级检查,全量证据由 CI 承担。

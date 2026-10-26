@@ -64,7 +64,7 @@ Scrollbars stay inside their container: use the shared scrollbar styles rather t
 
 ## Responsive layout
 
-Responsive behavior, text truncation, title wrapping, icon-only controls, and focus preservation during width changes follow [responsive-ui](../responsive-ui/SKILL.md). This skill does not repeat its decision order; apply that order before judging visual polish here.
+Responsive behavior, mobile and touch detection, text truncation, title wrapping, icon-only controls, and focus preservation during width changes follow [responsive-ui](../responsive-ui/SKILL.md). This skill does not repeat its decision order; apply that order before judging visual polish here.
 
 ## Design review escalation
 

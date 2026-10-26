@@ -12,7 +12,7 @@
 | Agent Notes | [.agents/notes/](.agents/notes/) | 决策记录系统:proposed/implemented/rejected/archived + 门禁格式 + 冻结归档 |
 | 技能 | [.agents/skills/](.agents/skills/) | 11 个方法论技能:`prose-standard`、`trim-cot-leakage`、`code-review`、`ci-test-reliability`、`pre-push-checks`、`find-simplifications`、`archive-agent-notes`、`client-ui-ux`、`responsive-ui`、`error-handling`、`speed-up-perf` |
 | 机械门禁 | [lefthook.yml](lefthook.yml) + [scripts/](scripts/) + [.github/workflows/ci.yml](.github/workflows/ci.yml) | pre-commit/pre-push hooks、`doc-sync` 聚合 7 个 gate(markdown 链接与锚点、markdown 折行、笔记分类、笔记格式、归档封存、文档预算、技能元数据)、CI 全量 |
-| 工具链 | [package.json](package.json) + [.oxlintrc.json](.oxlintrc.json) | pnpm 11.28、Node `^22.19 || >=24`、TypeScript 6、Vitest 4、oxlint(不是 ESLint)、lefthook 2;`build:artifacts` 产出、`build:check` 校验产物平面 |
+| 工具链 | [package.json](package.json) + [.oxlintrc.json](.oxlintrc.json) | pnpm 11.28、Node `>=24.9`、TypeScript 6、Vitest 4、oxlint(不是 ESLint)、lefthook 2;`build:artifacts` 产出、`build:check` 校验产物平面 |
 
 ## 从 DSH 丢弃或偏离的部分(及原因)
 
