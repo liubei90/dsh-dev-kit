@@ -29,6 +29,7 @@
 - [开发指南](docs/development.md):环境准备、日常流程、CI 组织。
 - [测试策略](docs/testing.md):分层、规则、E2E 自跳过机制。
 - [防御模式](docs/defensive-patterns/README.md):按 artifact 分页的评审规则(通用、服务端与 API、客户端组件、共享契约)。
+- [资产归属](docs/asset-ownership.md):哪些文件由模板维护、哪些可以自由改、哪些需要合并。
 
 ## 快速开始
 

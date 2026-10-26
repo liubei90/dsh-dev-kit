@@ -17,6 +17,8 @@ scripts/       门禁与工具脚本
 
 包命名 `@devkit/<name>`(重命名项目时同步改)。`apps/*/` 是可独立运行的入口;`packages/*/` 是被消费的库,不独立运行。根 `tsconfig.json` 是类型检查工程(覆盖 `src` + `tests` + `scripts` 与根配置,`noEmit`);`apps/*`、`packages/*` 各自的 `tsconfig.json` 负责构建产出;`tsconfig.base.json` 用 `paths` 把 `@devkit/shared` 指到源码(源码平面),`tsconfig.artifacts.json` 把它指到构建后的声明(产物平面),两者分开验证。
 
+改仓库文件前先确认[资产归属](docs/asset-ownership.md):框架资产跟随模板,混合资产按结构合并,项目资产可直接改。
+
 ## Commands
 
 ```sh

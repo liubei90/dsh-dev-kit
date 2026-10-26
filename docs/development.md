@@ -1,6 +1,6 @@
 # 开发指南(Development)
 
-从环境准备到日常流程的贡献者参考。命令总表见根 [AGENTS.md](../AGENTS.md)。
+从环境准备到日常流程的贡献者参考。命令总表见根 [AGENTS.md](../AGENTS.md)。用模板创建新项目时,先读 [资产归属](asset-ownership.md) 决定哪些文件可以改。
 
 ## 环境准备
 
