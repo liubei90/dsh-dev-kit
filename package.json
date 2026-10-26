@@ -2,6 +2,7 @@
   "name": "dsh-dev-kit",
   "version": "0.1.0",
   "private": true,
+  "dshDevKit": { "version": 1 },
   "description": "AI-agent-first full-stack TypeScript monorepo template (pnpm workspaces), migrating the DeepSeek Harness development system: layered AGENTS.md + Agent Notes + skills + mechanical gates",
   "type": "module",
   "packageManager": "pnpm@11.28.5",
