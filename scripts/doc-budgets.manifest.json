@@ -1,15 +1,17 @@
 {
-  "README.md": 900,
-  "AGENTS.md": 2300,
-  "docs/AGENTS.md": 1870,
+  "README.md": 1020,
+  "AGENTS.md": 2480,
+  "docs/AGENTS.md": 2040,
   "docs/asset-ownership.md": 1000,
   "docs/architecture.md": 510,
-  "docs/development.md": 750,
+  "docs/development.md": 840,
   "docs/testing.md": 630,
+  "docs/web-styling.md": 1320,
   "docs/defensive-patterns/README.md": 640,
   "docs/defensive-patterns/general.md": 1190,
   "docs/defensive-patterns/server-and-api.md": 840,
   "docs/defensive-patterns/client-components.md": 800,
   "docs/defensive-patterns/shared-contracts.md": 740,
+  "docs/persistence-changes/README.md": 1130,
   ".agents/notes/README.md": 2930
 }

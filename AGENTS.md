@@ -37,7 +37,7 @@ pnpm run check:all      # doc-sync + lint + typecheck + test + build
 pnpm run change-scope --base <base>   # 本次 diff 范围;必须带 --base,否则报错退出 2
 ```
 
-`pnpm run doc-sync` 覆盖 markdown 链接与锚点、折行、笔记分类、笔记格式、归档封存、文档预算、技能元数据这七个门禁;每个门禁是一条独立 `pnpm run` 脚本,聚合器只列名并支持 `needs` 与 fail-fast,未知 mode 退出 2。单跑某个门禁:pnpm run verify-md-links、verify-md-wrap、verify-doc-budgets、verify-agent-note-classification、verify-agent-note-format、verify-archived-agent-notes、verify-skill-invocation-metadata。`doc-sync` 必须进 CI。
+`pnpm run doc-sync` 覆盖 markdown 链接与锚点、折行、文档 TypeScript 编译、笔记分类、笔记格式、归档封存、持久化目录、持久化变更、文档预算、技能元数据这十个门禁;每个门禁是一条独立 `pnpm run` 脚本,聚合器只列名并支持 `needs` 与 fail-fast,未知 mode 退出 2。单跑某个门禁:pnpm run verify-md-links、verify-md-wrap、doc-typecheck、verify-agent-note-classification、verify-agent-note-format、verify-archived-agent-notes、verify-persistence-catalog、verify-persistence-changes、verify-doc-budgets、verify-skill-invocation-metadata。`doc-sync` 必须进 CI。
 
 ### 本地只跑相关检查
 
@@ -54,6 +54,7 @@ pnpm run change-scope --base <base>   # 本次 diff 范围;必须带 --base,否�
 
 **数据库与迁移**
 - schema 变更必须带迁移文件;迁移向后兼容,破坏性变更需显式评审。
+- 持久化 schema(`apps/api/migrations/*.sql`)变更必须在同一 PR 里重新生成 `docs/persistence-catalog.md`(`pnpm run gen-persistence-catalog`)并新增一条 [持久化变更记录](docs/persistence-changes/README.md);`verify-persistence-changes` 会拒绝没有记录的 schema 变化。
 - SQL 一律参数化,禁止字符串拼接;新访问路径带索引评审。
 
 **安全与权限**

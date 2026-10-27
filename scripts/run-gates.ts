@@ -5,7 +5,7 @@
  *
  * A gate is one `pnpm run <script>` invocation. `doc-sync` is also a gate that
  * only lists dependencies, so `check-all` composes it instead of repeating the
- * seven documentation scripts, and every such script still runs exactly once.
+ * ten documentation scripts, and every such script still runs exactly once.
  */
 
 import { spawn } from 'node:child_process'
@@ -39,9 +39,12 @@ function scriptGate(id: string, script: string, label: string = script): Gate {
 const DOCUMENTATION_GATE_IDS: readonly string[] = [
   'markdown-links',
   'markdown-wrap',
+  'doc-typecheck',
   'agent-note-classification',
   'agent-note-format',
   'archived-agent-notes',
+  'persistence-catalog',
+  'persistence-changes',
   'doc-budgets',
   'skill-invocation-metadata',
 ]
@@ -50,9 +53,12 @@ const DOCUMENTATION_GATE_IDS: readonly string[] = [
 const GATES: readonly Gate[] = [
   scriptGate('markdown-links', 'verify-md-links', 'markdown links'),
   scriptGate('markdown-wrap', 'verify-md-wrap', 'markdown wrap'),
+  scriptGate('doc-typecheck', 'doc-typecheck', 'documentation typecheck'),
   scriptGate('agent-note-classification', 'verify-agent-note-classification', 'agent note classification'),
   scriptGate('agent-note-format', 'verify-agent-note-format', 'agent note format'),
   scriptGate('archived-agent-notes', 'verify-archived-agent-notes', 'archived agent notes'),
+  scriptGate('persistence-catalog', 'verify-persistence-catalog', 'persistence catalog'),
+  scriptGate('persistence-changes', 'verify-persistence-changes', 'persistence changes'),
   scriptGate('doc-budgets', 'verify-doc-budgets', 'documentation budgets'),
   scriptGate('skill-invocation-metadata', 'verify-skill-invocation-metadata', 'skill invocation metadata'),
   // A group gate: `check-all` depends on it, and it expands to the scripts above.

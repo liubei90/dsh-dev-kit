@@ -18,11 +18,12 @@ node scripts/install-lefthook.mjs
 
 1. 从 `main` 拉新分支;大功能先写 proposed Agent Note,生命周期与文件格式见 [Agent Notes](../.agents/notes/README.md)。
 2. 实现并写测试,分层与选取规则见 [docs/testing.md](testing.md);文档与注释的写法见 [prose-standard](../.agents/skills/prose-standard/SKILL.md)。
-3. 文档同步:`pnpm run doc-sync` 跑 7 个文档门禁;受影响的 README 与 JSDoc 和代码在同一变更里更新。
-4. TypeScript 变更声明完成前跑 `pnpm run build`(先 `build:artifacts` 产出,再 `build:check` 校验);只改了源码且不涉及导出面时,`pnpm run typecheck` 已覆盖源码平面。
-5. 推前用 [pre-push-checks](../.agents/skills/pre-push-checks/SKILL.md) 选最小证据:先 `pnpm run change-scope --base <base>` 看 diff 范围,再只跑覆盖该改动的测试与门禁。
-6. 提交由 lefthook 把关:staged lint 与空白检查、Agent Note 分类与格式、归档封存、技能元数据;push 触发 `pnpm run typecheck` 与 `pnpm run test:affected`。
-7. PR 评审用 [code-review](../.agents/skills/code-review/SKILL.md);合并时把 proposed 笔记改写为 implemented,状态行与骨架同时改。
+3. 文档同步:`pnpm run doc-sync` 跑 10 个文档门禁;受影响的 README 与 JSDoc 和代码在同一变更里更新。
+4. 持久化变更:改了 `apps/api/migrations/*.sql` 时,先 `pnpm run gen-persistence-catalog` 重新生成 `docs/persistence-catalog.md`,再按 [记录模板](persistence-changes/README.md)新增一条变更记录;`verify-persistence-changes` 会拒绝没有记录的 schema 变化。
+5. TypeScript 变更声明完成前跑 `pnpm run build`(先 `build:artifacts` 产出,再 `build:check` 校验);只改了源码且不涉及导出面时,`pnpm run typecheck` 已覆盖源码平面。
+6. 推前用 [pre-push-checks](../.agents/skills/pre-push-checks/SKILL.md) 选最小证据:先 `pnpm run change-scope --base <base>` 看 diff 范围,再只跑覆盖该改动的测试与门禁。
+7. 提交由 lefthook 把关:staged lint 与空白检查、Agent Note 分类与格式、归档封存、技能元数据;push 触发 `pnpm run typecheck` 与 `pnpm run test:affected`。
+8. PR 评审用 [code-review](../.agents/skills/code-review/SKILL.md);合并时把 proposed 笔记改写为 implemented,状态行与骨架同时改。
 
 ## 构建与产物平面
 

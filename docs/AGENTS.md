@@ -20,18 +20,21 @@
 | [architecture.md](architecture.md) | 有序地图:应用组成、模块关系、扩展点;改架构前先读 | 类型定义、逐包细节、决策理由、实现状态标注 |
 | [development.md](development.md) | 贡献者环境、日常流程与 CI 概览 | 运行时与版本理由(→ Agent Notes)、会随 `package.json` 漂移的逐项检查清单 |
 | [testing.md](testing.md) | 测试分层、各层职责与门禁 | 测试实现走查 |
-| [defensive-patterns/](defensive-patterns/README.md) | 评审时强制执行的规则,按 artifact 分页:一页通用 bug 类,外加服务端与 API、客户端组件、共享契约各一页 | 类型定义与语义(→ `architecture.md`)、决策理由(→ Agent Notes) |
+| [defensive-patterns/](defensive-patterns/README.md) | 实现前必读、评审时强制执行的规则,按 artifact 分页:一页通用 bug 类,外加服务端与 API、客户端组件、共享契约各一页 | 类型定义与语义(→ `architecture.md`)、决策理由(→ Agent Notes) |
+| [persistence-changes/](persistence-changes/README.md) | 持久化 schema 的变更确认记录、当前目录与兼容性决定;`apps/api/migrations` 变化必须留痕 | 行为叙述(→ `architecture.md`)、决策理由(→ Agent Notes) |
+| [web-styling.md](web-styling.md) | 浏览器端样式所有权与组件规则;设计系统未落地时只写与实现无关的原则 | 组件实现细节(→ 包 README)、具体 token 值(→ 主题包) |
 | Agent Notes(`.agents/notes/`) | 活跃决策记录:为什么、放弃了什么、所需验证;`implemented/` 用现在时描述已交付现实([规则](../.agents/notes/README.md)) | 迁移计划、验收清单、spec-speak;归档笔记是冻结历史,不是当前权威 |
 | Skills(`.agents/skills/`) | 可复用工作流与专项决策标准 | 产品与运行时契约(→ docs 或源码) |
 | 包/app README | 该包契约:配置、语义、限制、扩展点 | JSDoc 复述、其他包的关注点 |
 
-放置规则:理由 → Agent Notes;流程 → `docs/development.md`;类型 → 所属模块文档;包契约 → README;站立命令 → 根 `AGENTS.md` 并带理由链接;评审强制规则 → `defensive-patterns/`。新增层级的方式是创建目录并在此表加一行。
+放置规则:理由 → Agent Notes;流程 → `docs/development.md`;类型 → 所属模块文档;包契约 → README;站立命令 → 根 `AGENTS.md` 并带理由链接;评审强制规则 → `defensive-patterns/`;持久化格式变更 → `persistence-changes/`。新增层级的方式是创建目录并在此表加一行。
 
 ## 写作规则
 
 - **写当前状态,不写变更史。** 不写 "previously/now/no longer"、PR 或 commit;变更故事放 commit、PR 或 Agent Note。
 - **每段一个物理行**(`verify-md-wrap` 会红):用编辑器软换行;代码块、表格与列表保持各自格式。
 - **锚点链接必须指向真实存在的标题。** `verify-md-links` 校验目标文件与目标标题的 GitHub slug;锚点写不准就改成不带锚点的相对链接。
+- **围栏 ```ts 块必须可编译**(`doc-typecheck`):文档里的 TypeScript 示例要能通过编译;示意性草图用 ```ts ignore-check,豁免比例不得超过 25%。
 - **注释与 JSDoc 写完整契约,不是推理转写。** 保留行为、失败、时序、所有权、异常与后果;删叙述、测试走查、评审分析与代码复述;每个模块与导出有简洁 JSDoc,函数式导出带 `@param`/`@returns`([prose-standard](../.agents/skills/prose-standard/SKILL.md))。
 - **直写:点名行为者与事实。** 不用隐喻;写准确的检查、类型、API、操作或行为,而不是含糊的"门禁""表面"。
 - **非平凡变更必须在同一 PR 带 Agent Note。** 仅机械/局部编辑豁免;更新已拥有该决策的笔记即可,不要重复建([规则](../.agents/notes/README.md)、[implemented 笔记](../.agents/notes/implemented/AGENTS.md))。

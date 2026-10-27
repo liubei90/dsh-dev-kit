@@ -11,7 +11,7 @@
 | 分层 AGENTS.md | [AGENTS.md](AGENTS.md) + `CLAUDE.md`(符号链接)+ [docs/AGENTS.md](docs/AGENTS.md) | 站立命令 + 文档标准;Conventions 已按全栈 TS 重写 |
 | Agent Notes | [.agents/notes/](.agents/notes/) | 决策记录系统:proposed/implemented/rejected/archived + 门禁格式 + 冻结归档 |
 | 技能 | [.agents/skills/](.agents/skills/) | 11 个方法论技能:`prose-standard`、`trim-cot-leakage`、`code-review`、`ci-test-reliability`、`pre-push-checks`、`find-simplifications`、`archive-agent-notes`、`client-ui-ux`、`responsive-ui`、`error-handling`、`speed-up-perf` |
-| 机械门禁 | [lefthook.yml](lefthook.yml) + [scripts/](scripts/) + [.github/workflows/ci.yml](.github/workflows/ci.yml) | pre-commit/pre-push hooks、`doc-sync` 聚合 7 个 gate(markdown 链接与锚点、markdown 折行、笔记分类、笔记格式、归档封存、文档预算、技能元数据)、CI 全量 |
+| 机械门禁 | [lefthook.yml](lefthook.yml) + [scripts/](scripts/) + [.github/workflows/ci.yml](.github/workflows/ci.yml) | pre-commit/pre-push hooks、`doc-sync` 聚合 10 个 gate(markdown 链接与锚点、折行、文档 TypeScript 编译、笔记分类、笔记格式、归档封存、持久化目录、持久化变更、文档预算、技能元数据)、CI 全量 |
 | 工具链 | [package.json](package.json) + [.oxlintrc.json](.oxlintrc.json) | pnpm 11.28、Node `>=24.9`、TypeScript 6、Vitest 4、oxlint(不是 ESLint)、lefthook 2;`build:artifacts` 产出、`build:check` 校验产物平面 |
 
 ## 从 DSH 丢弃或偏离的部分(及原因)
@@ -29,6 +29,8 @@
 - [开发指南](docs/development.md):环境准备、日常流程、CI 组织。
 - [测试策略](docs/testing.md):分层、规则、E2E 自跳过机制。
 - [防御模式](docs/defensive-patterns/README.md):按 artifact 分页的评审规则(通用、服务端与 API、客户端组件、共享契约)。
+- [Web 样式](docs/web-styling.md):浏览器端样式所有权、组件规则,以及设计系统落地后的迁移路线。
+- [持久化变更](docs/persistence-changes/README.md):schema 变更记录、当前目录与兼容性决定。
 - [资产归属](docs/asset-ownership.md):哪些文件由模板维护、哪些可以自由改、哪些需要合并。
 
 ## 快速开始

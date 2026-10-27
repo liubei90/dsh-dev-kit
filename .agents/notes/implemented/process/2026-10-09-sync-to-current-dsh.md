@@ -14,7 +14,7 @@ Status: implemented
 - **门禁按当前实现移植**：`.agents/notes` 的生命周期与分类封闭集收敛到 `scripts/agent-note-tree.ts` 单一来源，并新增分类门禁；格式门禁增加"第 4 行必须空行""全文件只允许一个 `Status:` 行""`implemented/` 禁止提案期标题"；归档从"三件套"改成单文件封存，哈希清单只追加，`--write` 同样受校验错误阻断；Markdown 门禁改用 mdast，`verify-md-links` **校验锚点**，`verify-md-wrap` 按 AST 段落判定折行。
 - **门禁的读取与并发成本有上限**：Markdown 门禁每篇文档每轮只解析一次（`markdownHeadingLines`/`markdownProseLines` 接受已解析树，`markdownLinkCache` 同时缓存解析结果与存在性探针），`repo-files` 每轮共享目录列表；`scripts/parallelism.ts` 给本地 lint 设线程上限（CI 用满 CPU，`OXLINT_THREADS` 可覆盖）。
 - **文档预算改成 CJK 感知计数**：CJK 字符各计 1，非 CJK 的空白分隔 token 各计 1，让中文文档与英文文档在同一把尺子上计量。
-- **`doc-sync` 真的覆盖文档门禁并进入 CI**：`doc-sync` = 7 个文档 gate（markdown 链接、markdown 折行、笔记分类、笔记格式、归档封存、文档预算、技能元数据）；`check:all` 在它之上加 lint / typecheck / test / build；CI 的 gates job 在 Node 24.9 与 26 上跑 lint、typecheck、test、doc-sync、coverage。
+- **`doc-sync` 真的覆盖文档门禁并进入 CI**：`doc-sync` = 10 个文档 gate（markdown 链接、markdown 折行、文档 TypeScript 编译、笔记分类、笔记格式、归档封存、持久化目录、持久化变更、文档预算、技能元数据）；`check:all` 在它之上加 lint / typecheck / test / build；CI 的 gates job 在 Node 24.9 与 26 上跑 lint、typecheck、test、doc-sync、coverage。
 - **防御模式按 artifact 分页**：`docs/defensive-patterns/` 由一个通用页（时序、所有权、生命周期、迁移）和服务端与 API、客户端组件、共享契约三个 artifact 页组成，README 提供五条评审原则与"改什么读哪页"的路由表；评审强制规则放在这一层，类型语义仍在 `docs/architecture.md`。
 - **源码平面与产物平面分开验证**：`build:artifacts` 只产出，`build:check` 读取产物校验包入口可加载并把消费端按 `lib` 声明做类型检查，`build` 依次执行两者；`typecheck` 继续覆盖 `src + tests + scripts` 的源码平面。
 - **技能**：原有 6 个升级到当前 DSH 版本，新增 `archive-agent-notes`、`client-ui-ux`、`speed-up-perf`、`responsive-ui`、`error-handling`，共 11 个；保持无 `dsh-` 前缀，内容去掉 DSH 专属机制。
