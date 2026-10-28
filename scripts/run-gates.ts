@@ -46,6 +46,7 @@ const DOCUMENTATION_GATE_IDS: readonly string[] = [
   'persistence-catalog',
   'persistence-changes',
   'doc-budgets',
+  'asset-ownership',
   'skill-invocation-metadata',
 ]
 
@@ -60,6 +61,7 @@ const GATES: readonly Gate[] = [
   scriptGate('persistence-catalog', 'verify-persistence-catalog', 'persistence catalog'),
   scriptGate('persistence-changes', 'verify-persistence-changes', 'persistence changes'),
   scriptGate('doc-budgets', 'verify-doc-budgets', 'documentation budgets'),
+  scriptGate('asset-ownership', 'verify-asset-ownership', 'asset ownership'),
   scriptGate('skill-invocation-metadata', 'verify-skill-invocation-metadata', 'skill invocation metadata'),
   // A group gate: `check-all` depends on it, and it expands to the scripts above.
   { id: 'doc-sync', label: 'documentation gates', needs: DOCUMENTATION_GATE_IDS },

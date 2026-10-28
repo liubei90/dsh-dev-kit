@@ -25,7 +25,7 @@ DeepSeek Harness 用 persistence-changes 与 doc-typecheck 两套门禁解决同
 
 ## Consequences
 
-- `doc-sync` 从 7 个门禁变成 10 个，CI 与本地耗时略增；换来的是两类漂移（schema 无记录、文档示例不编译）会被拦住。
+- `doc-sync` 新增这些门禁，CI 与本地耗时略增；换来的是两类漂移（schema 无记录、文档示例不编译）会被拦住。
 - SQL 解析器只支持声明的子集：`CHECK` 约束、块注释、索引表达式、schema 限定名等会带文件名与行号报错；扩展语法必须先扩解析器及其测试。
 - `docs/persistence-catalog.md` 是生成物，不纳入文档预算；新增表会让它自然变长。
 - `web-styling` 目前是约束未来实现的标准，不是对现状的描述；设计系统落地时按文末路线逐步替换，并把规则变成门禁。

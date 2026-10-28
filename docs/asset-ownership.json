@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "default": "project",
+  "rules": [
+    {
+      "category": "framework",
+      "patterns": [
+        ".agents/skills/**",
+        ".agents/notes/README.md",
+        ".agents/notes/**/AGENTS.md",
+        "docs/AGENTS.md",
+        "docs/defensive-patterns/**",
+        "docs/asset-ownership.md",
+        "docs/asset-ownership.json",
+        "docs/persistence-changes/README.md",
+        "scripts/**/*.ts",
+        "scripts/**/*.mjs",
+        "packages/devkit-repo/**",
+        "tools/**",
+        "lefthook.yml",
+        ".oxlintrc.json"
+      ]
+    },
+    {
+      "category": "mixed",
+      "patterns": [
+        ".github/workflows/**",
+        "AGENTS.md",
+        "package.json",
+        "pnpm-workspace.yaml",
+        "tsconfig*.json",
+        "vitest*.config.ts",
+        "docs/development.md",
+        "docs/testing.md",
+        "docs/web-styling.md",
+        "scripts/doc-budgets.manifest.json"
+      ]
+    }
+  ]
+}

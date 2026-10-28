@@ -5,7 +5,9 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "paths": {
-      "@devkit/shared": ["./packages/shared/src/index.ts"]
+      "@devkit/shared": ["./packages/shared/src/index.ts"],
+      "@devkit/repo": ["./packages/devkit-repo/src/index.ts"],
+      "@devkit/repo/readers": ["./packages/devkit-repo/src/readers.ts"]
     },
     "strict": true,
     "noImplicitAny": true,

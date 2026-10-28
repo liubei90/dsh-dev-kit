@@ -10,12 +10,15 @@ apps/
   web/         前端应用:页面、组件、客户端状态
 packages/
   shared/      前后端共享:类型、DTO、校验、常量
+  devkit-repo/ 仓库投影:契约与健康/图谱/门禁读取器(框架资产)
+tools/
+  console/     参考控制台:/_console(框架资产)
 docs/          架构、开发、测试、防御模式与文档标准
 .agents/       Agent Notes(notes/)与技能(skills/)
 scripts/       门禁与工具脚本
 ```
 
-包命名 `@devkit/<name>`(重命名项目时同步改)。`apps/*/` 是可独立运行的入口;`packages/*/` 是被消费的库,不独立运行。根 `tsconfig.json` 是类型检查工程(覆盖 `src` + `tests` + `scripts` 与根配置,`noEmit`);`apps/*`、`packages/*` 各自的 `tsconfig.json` 负责构建产出;`tsconfig.base.json` 用 `paths` 把 `@devkit/shared` 指到源码(源码平面),`tsconfig.artifacts.json` 把它指到构建后的声明(产物平面),两者分开验证。
+包命名 `@devkit/<name>`(重命名项目时同步改)。`apps/*/` 是可独立运行的入口;`packages/*/` 是被消费的库,不独立运行。根 `tsconfig.json` 是类型检查工程(覆盖 `src` + `tests` + `scripts` 与根配置,`noEmit`);`apps/*`、`packages/*` 各自的 `tsconfig.json` 负责构建产出;`tsconfig.base.json` 用 `paths` 把工作区包指到源码(源码平面),`tsconfig.artifacts.json` 把它指到构建后的声明(产物平面),两者分开验证。
 
 改仓库文件前先确认[资产归属](docs/asset-ownership.md):框架资产跟随模板,混合资产按结构合并,项目资产可直接改。
 
@@ -24,9 +27,9 @@ scripts/       门禁与工具脚本
 ```sh
 pnpm install            # pnpm workspaces,node >=24.9;postinstall 自动安装 lefthook hooks
 pnpm run build          # build:artifacts + build:check
-pnpm run build:artifacts # tsc -b apps/api apps/web packages/shared:只产出 artifacts
+pnpm run build:artifacts # tsc -b apps/api apps/web packages/shared packages/devkit-repo:只产出 artifacts
 pnpm run build:check    # 读已有产物:校验包入口可加载,并把消费端按 lib 声明做类型检查
-pnpm run typecheck      # tsc -p tsconfig.json,覆盖 src + tests + scripts(源码平面)
+pnpm run typecheck      # tsc -p tsconfig.json,覆盖 apps/packages/tools 的 src 与 tests、scripts(源码平面)
 pnpm run lint           # oxlint,规则在 .oxlintrc.json;lint:fix 加 --fix
 pnpm run test           # vitest run:单元与集成
 pnpm run test:coverage  # vitest run --coverage
@@ -34,10 +37,11 @@ pnpm run test:e2e       # 端到端(真浏览器/真 API,无凭据自跳过)
 pnpm run test:affected  # 只跑本次 diff 影响的测试
 pnpm run doc-sync       # 文档门禁聚合(scripts/run-gates.ts doc-sync)
 pnpm run check:all      # doc-sync + lint + typecheck + test + build
+pnpm run console        # 参考控制台:http://127.0.0.1:4310/_console
 pnpm run change-scope --base <base>   # 本次 diff 范围;必须带 --base,否则报错退出 2
 ```
 
-`pnpm run doc-sync` 覆盖 markdown 链接与锚点、折行、文档 TypeScript 编译、笔记分类、笔记格式、归档封存、持久化目录、持久化变更、文档预算、技能元数据这十个门禁;每个门禁是一条独立 `pnpm run` 脚本,聚合器只列名并支持 `needs` 与 fail-fast,未知 mode 退出 2。单跑某个门禁:pnpm run verify-md-links、verify-md-wrap、doc-typecheck、verify-agent-note-classification、verify-agent-note-format、verify-archived-agent-notes、verify-persistence-catalog、verify-persistence-changes、verify-doc-budgets、verify-skill-invocation-metadata。`doc-sync` 必须进 CI。
+`pnpm run doc-sync` 覆盖 markdown 链接与锚点、折行、文档 TypeScript 编译、笔记分类、笔记格式、归档封存、持久化目录、持久化变更、文档预算、资产归属、技能元数据这十一个门禁;每个门禁是一条独立 `pnpm run` 脚本,聚合器只列名并支持 `needs` 与 fail-fast,未知 mode 退出 2。单跑某个门禁:pnpm run verify-md-links、verify-md-wrap、doc-typecheck、verify-agent-note-classification、verify-agent-note-format、verify-archived-agent-notes、verify-persistence-catalog、verify-persistence-changes、verify-doc-budgets、verify-asset-ownership、verify-skill-invocation-metadata。`doc-sync` 必须进 CI。
 
 ### 本地只跑相关检查
 
@@ -51,6 +55,7 @@ pnpm run change-scope --base <base>   # 本次 diff 范围;必须带 --base,否�
 
 **前后端契约**
 - `packages/shared` 是契约的单一来源:API 变更同 PR 更新共享 DTO、校验与消费端类型;后端只经共享 DTO 收发字段,前端不手写与后端重复的模型类型。
+- `/_console` 保留给参考控制台;业务路由不得占用该前缀。
 
 **数据库与迁移**
 - schema 变更必须带迁移文件;迁移向后兼容,破坏性变更需显式评审。

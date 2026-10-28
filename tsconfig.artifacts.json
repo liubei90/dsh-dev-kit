@@ -10,7 +10,9 @@
     "types": ["node"],
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "paths": {
-      "@devkit/shared": ["./packages/shared/lib/index.d.ts"]
+      "@devkit/shared": ["./packages/shared/lib/index.d.ts"],
+      "@devkit/repo": ["./packages/devkit-repo/lib/index.d.ts"],
+      "@devkit/repo/readers": ["./packages/devkit-repo/lib/readers.d.ts"]
     }
   },
   "include": ["apps/*/src/**/*.ts"]

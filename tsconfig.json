@@ -16,6 +16,8 @@
     "apps/*/tests/**/*.ts",
     "packages/*/src/**/*.ts",
     "packages/*/tests/**/*.ts",
+    "tools/**/*.ts",
+    "tools/**/tests/**/*.ts",
     "scripts/**/*.ts",
     "*.config.ts"
   ]

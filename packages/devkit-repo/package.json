@@ -1,0 +1,29 @@
+{
+  "name": "@devkit/repo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./readers": {
+      "types": "./lib/readers.d.ts",
+      "default": "./lib/readers.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b"
+  },
+  "dependencies": {
+    "mdast-util-from-markdown": "^2.0.3",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/mdast": "^4.0.4",
+    "@types/node": "^22.20.1"
+  }
+}
