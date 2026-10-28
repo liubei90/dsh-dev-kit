@@ -1,0 +1,6 @@
+#!/bin/sh
+# Outgoing checks before refs leave the workstation. CI repeats them on a matrix.
+set -e
+
+pnpm run typecheck
+pnpm run test:affected

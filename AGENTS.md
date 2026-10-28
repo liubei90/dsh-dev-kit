@@ -25,7 +25,7 @@ scripts/       门禁与工具脚本
 ## Commands
 
 ```sh
-pnpm install            # pnpm workspaces,node >=24.9;postinstall 自动安装 lefthook hooks
+pnpm install            # pnpm workspaces,node >=24.9;postinstall 把 core.hooksPath 指到 .githooks
 pnpm run build          # build:artifacts + build:check
 pnpm run build:artifacts # tsc -b apps/api apps/web packages/shared packages/devkit-repo:只产出 artifacts
 pnpm run build:check    # 读已有产物:校验包入口可加载,并把消费端按 lib 声明做类型检查

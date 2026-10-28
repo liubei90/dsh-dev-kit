@@ -402,7 +402,31 @@ progress {
 }
 
 .graph-panel {
+  position: relative;
   overflow-x: auto;
+}
+
+.graph-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.graph-tools[hidden] {
+  display: none;
+}
+
+.graph-tools .meta {
+  margin-right: auto;
+}
+
+.graph-tools .button {
+  min-height: 30px;
+  padding: 2px 10px;
+  font-size: 0.85rem;
 }
 
 .graph {
@@ -412,6 +436,16 @@ progress {
   height: auto;
   border-radius: 8px;
   background: var(--code-bg);
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.graph.is-panning {
+  cursor: grabbing;
+}
+
+.graph-node-link {
+  cursor: pointer;
 }
 
 .graph-columns text {
@@ -524,16 +558,25 @@ progress {
   overflow: auto;
 }
 
-.graph-content__body {
-  max-height: 70vh;
-  overflow: auto;
-}
-
 .footer {
   padding: 20px clamp(16px, 2.4vw, 40px) 32px;
   color: var(--muted);
   font-size: 0.85rem;
   text-align: center;
+}
+
+@media (min-width: 861px) {
+  .split--graph--bounded {
+    align-items: stretch;
+  }
+
+  /* Size containment keeps the dependency list from stretching the row, so the
+     panel matches the canvas height and scrolls its own overflow. */
+  .split--graph--bounded .graph-detail {
+    contain: size;
+    min-height: 0;
+    overflow: auto;
+  }
 }
 
 @media (max-width: 1180px) {

@@ -2,7 +2,9 @@
   "name": "dsh-dev-kit",
   "version": "0.1.0",
   "private": true,
-  "dshDevKit": { "version": 1 },
+  "dshDevKit": {
+    "version": 1
+  },
   "description": "AI-agent-first full-stack TypeScript monorepo template (pnpm workspaces), migrating the DeepSeek Harness development system: layered AGENTS.md + Agent Notes + skills + mechanical gates",
   "type": "module",
   "packageManager": "pnpm@11.28.5",
@@ -36,7 +38,7 @@
     "verify-agent-note-format": "tsx scripts/verify-agent-note-format.ts",
     "verify-archived-agent-notes": "tsx scripts/verify-archived-agent-notes.ts",
     "verify-skill-invocation-metadata": "tsx scripts/verify-skill-invocation-metadata.ts",
-    "postinstall": "node scripts/install-lefthook.mjs"
+    "postinstall": "node scripts/install-git-hooks.mjs"
   },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^5.10.0",
@@ -46,7 +48,6 @@
     "@vitest/coverage-v8": "^4.1.11",
     "eslint-plugin-sonarjs": "^4.2.0",
     "js-yaml": "^4.3.2",
-    "lefthook": "^2.1.12",
     "mdast-util-from-markdown": "^2.0.3",
     "mdast-util-gfm": "^3.1.0",
     "micromark-extension-gfm": "^3.0.0",

@@ -30,7 +30,7 @@
 | `scripts/verify-*.ts`、`run-gates.ts` 等 | 框架 | 门禁实现;项目新增门禁用新脚本并在 `package.json` 注册 |
 | `scripts/doc-budgets.manifest.json` | 混合 | 机制属框架;每个文件的路径与上限属项目,更新时只补键 |
 | `package.json` | 混合 | `name`、`version`、`description` 与业务脚本属项目;门禁脚本与工具链依赖属框架 |
-| `.oxlintrc.json`、`lefthook.yml` | 框架 | 工具链规则;项目确有差异时单独说明 |
+| `.oxlintrc.json`、`.githooks/` | 框架 | 工具链规则与本地钩子;差异时单独说明 |
 | `tsconfig*.json`、`vitest*.config.ts` | 混合 | 编译与测试基础设施;`paths` 与项目别名属项目 |
 | `apps/**`、`packages/shared/**` | 项目 | 业务代码;框架库见上方的 `packages/devkit-repo` |
 | `README.md` | 项目 | 项目说明;替换模板介绍 |

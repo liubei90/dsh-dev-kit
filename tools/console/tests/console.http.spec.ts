@@ -139,22 +139,44 @@ describe('console pages', () => {
     expect(html).not.toContain('节点清单')
   })
 
+  it('shows the repository path on node hover and exposes the zoom controls', async () => {
+    const html = await (await fetch(`${base}/_console/graph`)).text()
+    expect(html).toContain('<title>.agents/skills/demo/SKILL.md</title>')
+    expect(html).toContain('<title>docs/architecture.md</title>')
+    expect(html).toContain('aria-label="技能 demo · .agents/skills/demo/SKILL.md"')
+    expect(html).toContain('data-graph-viewport')
+    expect(html).toContain('data-graph-tools hidden')
+    expect(html).toContain('data-graph-zoom="in"')
+    expect(html).toContain('data-graph-zoom="out"')
+    expect(html).toContain('data-graph-zoom="reset"')
+    expect(html).toContain('Ctrl + 滚轮缩放，拖拽平移')
+  })
+
   it('shows the selected node body outside the dependency panel', async () => {
     const html = await (await fetch(`${base}/_console/graph?node=README.md`)).text()
     expect(html).toContain('README_CONTENT_MARKER')
-    expect(html).toContain('graph-content__body')
+    expect(html).toContain('<pre class="prose">')
+    expect(html).toContain('split split--graph split--graph--bounded')
 
     const detailStart = html.indexOf('class="panel graph-detail"')
     const detailEnd = html.indexOf('</aside>', detailStart)
     expect(detailStart).toBeGreaterThan(-1)
     expect(detailEnd).toBeGreaterThan(detailStart)
-    expect(html.slice(detailStart, detailEnd)).not.toContain('README_CONTENT_MARKER')
+    const detail = html.slice(detailStart, detailEnd)
+    expect(detail).toContain('<code>README.md</code>')
+    expect(detail).not.toContain('README_CONTENT_MARKER')
   })
 
   it('filters nodes by ownership', async () => {
     const html = await (await fetch(`${base}/_console/graph?ownership=framework`)).text()
     expect(html).toContain('data-node=".agents/skills/demo/SKILL.md"')
     expect(html).not.toContain('data-node="apps/web/README.md"')
+  })
+
+  it('drops the fixed canvas height when the filters leave no nodes', async () => {
+    const html = await (await fetch(`${base}/_console/graph?kind=note&ownership=framework`)).text()
+    expect(html).toContain('没有匹配的节点')
+    expect(html).not.toContain('split--graph--bounded')
   })
 
   it('renders the gate catalog with forms', async () => {
@@ -173,6 +195,9 @@ describe('console pages', () => {
     const js = await fetch(`${base}/_console/assets/console.js`)
     expect(js.status).toBe(200)
     expect(js.headers.get('content-type')).toContain('text/javascript')
+    const source = await js.text()
+    expect(source.match(/addEventListener\('wheel'/gu) ?? []).toHaveLength(1)
+    expect(source).toContain('if (!event.ctrlKey && !event.metaKey) return')
     expect((await fetch(`${base}/_console/assets/missing.js`)).status).toBe(404)
   })
 

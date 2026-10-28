@@ -17,7 +17,7 @@
         "scripts/**/*.mjs",
         "packages/devkit-repo/**",
         "tools/**",
-        "lefthook.yml",
+        ".githooks/**",
         ".oxlintrc.json"
       ]
     },

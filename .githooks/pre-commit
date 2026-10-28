@@ -1,0 +1,31 @@
+#!/bin/sh
+# Staged checks. CI owns the full matrix; this is the fast local checkpoint.
+set -e
+
+staged_files() {
+  git diff --cached --name-only --diff-filter=ACMR -z -- "$@"
+}
+
+has_staged_files() {
+  [ -n "$(git diff --cached --name-only --diff-filter=ACMR -- "$@")" ]
+}
+
+git diff --cached --check
+
+if has_staged_files '*.ts' '*.tsx'; then
+  staged_files '*.ts' '*.tsx' | xargs -0 pnpm exec tsx scripts/run-oxlint.ts --fix
+  staged_files '*.ts' '*.tsx' | xargs -0 git add --
+fi
+
+if has_staged_files '.agents/notes/'; then
+  pnpm run verify-agent-note-classification
+  pnpm run verify-agent-note-format
+fi
+
+if has_staged_files '.agents/notes/archived/'; then
+  pnpm run verify-archived-agent-notes
+fi
+
+if has_staged_files '.agents/skills/'; then
+  pnpm run verify-skill-invocation-metadata
+fi

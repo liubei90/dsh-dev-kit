@@ -5,11 +5,11 @@
 ## 环境准备
 
 - Node.js `>=24.9`(见 [package.json](../package.json) 的 `engines.node`);启用 Corepack 的 pnpm,仓库锁定 `pnpm@11.28.5`。
-- `pnpm install` 安装依赖,并运行 `postinstall`([scripts/install-lefthook.mjs](../scripts/install-lefthook.mjs))配置 lefthook hooks。
+- `pnpm install` 安装依赖,并运行 `postinstall`([scripts/install-git-hooks.mjs](../scripts/install-git-hooks.mjs))把 `core.hooksPath` 指到 `.githooks/`。
 - hooks 缺失(依赖从缓存恢复,或安装时跳过了 `postinstall`)时,手动补救:
 
 ```sh
-node scripts/install-lefthook.mjs
+node scripts/install-git-hooks.mjs
 ```
 
 - 首次 `pnpm run typecheck` 通过即环境就绪。
@@ -22,7 +22,7 @@ node scripts/install-lefthook.mjs
 4. 持久化变更:改了 `apps/api/migrations/*.sql` 时,先 `pnpm run gen-persistence-catalog` 重新生成 `docs/persistence-catalog.md`,再按 [记录模板](persistence-changes/README.md)新增一条变更记录;`verify-persistence-changes` 会拒绝没有记录的 schema 变化。
 5. TypeScript 变更声明完成前跑 `pnpm run build`(先 `build:artifacts` 产出,再 `build:check` 校验);只改了源码且不涉及导出面时,`pnpm run typecheck` 已覆盖源码平面。
 6. 推前用 [pre-push-checks](../.agents/skills/pre-push-checks/SKILL.md) 选最小证据:先 `pnpm run change-scope --base <base>` 看 diff 范围,再只跑覆盖该改动的测试与门禁。
-7. 提交由 lefthook 把关:staged lint 与空白检查、Agent Note 分类与格式、归档封存、技能元数据;push 触发 `pnpm run typecheck` 与 `pnpm run test:affected`。
+7. 提交由 [.githooks/](../.githooks/) 里的 sh 钩子把关:staged lint 与空白检查、Agent Note 分类与格式、归档封存、技能元数据;push 触发 `pnpm run typecheck` 与 `pnpm run test:affected`。
 8. PR 评审用 [code-review](../.agents/skills/code-review/SKILL.md);合并时把 proposed 笔记改写为 implemented,状态行与骨架同时改。
 
 ## 参考控制台

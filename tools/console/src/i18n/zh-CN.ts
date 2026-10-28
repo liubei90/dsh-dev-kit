@@ -71,6 +71,10 @@ const messages = {
   'graph.content.title': '文档内容',
   'graph.content.empty': '在图中选择一个节点查看内容。',
   'graph.content.missing': '没有可展示的内容。',
+  'graph.zoom.in': '放大',
+  'graph.zoom.out': '缩小',
+  'graph.zoom.reset': '重置视图',
+  'graph.zoom.hint': 'Ctrl + 滚轮缩放，拖拽平移',
 
   'gates.title': '门禁',
   'gates.subtitle': '列出门禁脚本并运行；同一时间只允许一个运行。',

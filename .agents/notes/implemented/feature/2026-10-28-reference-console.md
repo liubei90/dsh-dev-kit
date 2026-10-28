@@ -11,7 +11,7 @@ Status: implemented
 模板新增自看式只读控制台:服务端渲染、`/_console` 前缀、无 Fastify/React,门禁默认可以运行。框架事实与业务交付分层。
 
 - **数据层**:`packages/devkit-repo` 持有 zod 契约与读取器(笔记、技能、文档预算、门禁目录、链接图)以及归属分类器;根出口浏览器安全,`./readers` 使用 Node 文件系统。依赖方向只有 `tools/console → packages/devkit-repo`,框架包不 import `packages/shared`、`apps/*` 或 `scripts/*`。
-- **控制台**:`tools/console` 用 `node:http` 路由、服务端拼 HTML、一份 CSS 与一份无构建的渐进增强 JS;标签页、筛选、详情与门禁表单都无需 JS。`/_console` 是保留前缀,`/` 返回 404,所有链接与表单 action 都从同一常量生成。
+- **控制台**:`tools/console` 用 `node:http` 路由、服务端拼 HTML、一份 CSS 与一份无构建的渐进增强 JS;标签页、筛选、详情与门禁表单都无需 JS。`/_console` 是保留前缀,`/` 返回 404,所有链接与表单 action 都从同一常量生成。图谱把仓库路径作为节点的 SVG 悬停标题与无障碍名称的一部分;画布可左键拖拽平移,缩放走 Ctrl+滚轮与工具条按钮,普通滚轮留给页面滚动;选中节点时详情显示文件路径、与画布等高并在面板内滚动,正文出现在下方且不设高度上限;拖拽后不会误触节点链接,脚本缺失时保持初始视图。
 - **只看自己**:没有项目注册表、`dshDevKit` 标记校验、目录浏览或项目选择器;仓库根从模块位置推导,测试与环境变量覆盖。
 - **门禁**:列表与运行都迁入;目录是 `verify-*` 加 `doc-sync`、`check:all`、`lint`、`typecheck`、`test`、`test:coverage`、`build`。默认开启,但请求只给脚本名,一次只运行一个,第二个返回 409;超时(默认 300 秒)、每路输出截断 256 KiB、超时或关闭时杀掉整个进程树;记录只在内存,最多 20 条。
 - **安全**:只绑定 `127.0.0.1`;校验 `Host`,并拒绝跨站 `Origin`/`Sec-Fetch-Site` 的写请求;响应带 CSP 与 `nosniff`;所有仓库文本先转义,笔记正文按纯文本渲染。
@@ -43,6 +43,6 @@ Status: implemented
 
 ## Testing
 
-- `packages/devkit-repo` 28 个单测覆盖笔记/技能/预算/门禁/图谱/归属与契约;`tools/console` 26 个测试用临时仓库与真实 HTTP 覆盖页面、JSON、转义、Host/Origin、资产、文档正文、门禁运行、超时、截断、并发与关闭。
+- `packages/devkit-repo` 28 个单测覆盖笔记/技能/预算/门禁/图谱/归属与契约;`tools/console` 28 个测试用临时仓库与真实 HTTP 覆盖页面、JSON、转义、Host/Origin、资产、文档正文、路径悬停标题、详情文件路径、等高面板、缩放工具条、门禁运行、超时、截断、并发与关闭。
 - `scripts/asset-ownership.spec.ts` 覆盖规则未命中、重复模式、跨类认领、版本与自分类,并与读取器的 glob 逐例对照。
 - 手工冒烟:`pnpm run console` 后访问健康与图谱,再通过 API 运行 `verify-md-wrap` 并读到退出码 0。

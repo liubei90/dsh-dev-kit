@@ -1,6 +1,8 @@
 /**
  * Knowledge graph page: an inline SVG laid out in one column per node kind,
  * colored by asset ownership, with a detail panel, legend, and text fallback.
+ * The browser script adds zoom and pan around the static layout; every node
+ * carries its repository path as the SVG tooltip.
  */
 
 import type { AssetCategory, Graph, GraphNode, GraphNodeKind } from '@devkit/repo'
@@ -69,16 +71,26 @@ function option(value: string, label: string, selected: boolean): string {
   return `<option value="${escapeHtml(value)}"${selected ? ' selected' : ''}>${escapeHtml(label)}</option>`
 }
 
-/** Render one placed node as an SVG anchor. */
+/** Render one placed node as an SVG anchor whose tooltip is the repository path. */
 function renderNode(node: GraphNode, x: number, y: number, href: string): string {
   const label = truncateLabel(node.title, 28)
-  return `<a class="graph-node-link" href="${escapeHtml(href)}" aria-label="${escapeHtml(`${kindLabel(node.kind)} ${node.title}`)}">
+  return `<a class="graph-node-link" href="${escapeHtml(href)}" aria-label="${escapeHtml(`${kindLabel(node.kind)} ${node.title} · ${node.id}`)}">
   <g class="graph-node graph-node--${node.ownership}" data-node="${escapeHtml(node.id)}">
     <circle cx="${String(x)}" cy="${String(y)}" r="11"></circle>
     <text x="${String(x + 18)}" y="${String(y + 4)}">${escapeHtml(label)}</text>
-    <title>${escapeHtml(`${node.title} · ${ownershipLabel(node.ownership)}`)}</title>
+    <title>${escapeHtml(node.id)}</title>
   </g>
 </a>`
+}
+
+/** Render the zoom controls; the browser script reveals them and wires the buttons. */
+function renderZoomTools(): string {
+  return `<div class="graph-tools" data-graph-tools hidden>
+  <span class="meta">${escapeHtml(t('graph.zoom.hint'))}</span>
+  <button class="button" type="button" data-graph-zoom="out">${escapeHtml(t('graph.zoom.out'))}</button>
+  <button class="button" type="button" data-graph-zoom="in">${escapeHtml(t('graph.zoom.in'))}</button>
+  <button class="button" type="button" data-graph-zoom="reset">${escapeHtml(t('graph.zoom.reset'))}</button>
+</div>`
 }
 
 /** Render the detail panel for the selected node; it lists dependencies only. */
@@ -107,6 +119,7 @@ function renderDetail(
   return `<aside class="panel graph-detail">
   <h2>${escapeHtml(t('graph.detail.title'))}</h2>
   <h3>${escapeHtml(selected.title)}</h3>
+  <p class="meta"><code>${escapeHtml(selected.id)}</code></p>
   <h3>${escapeHtml(t('graph.detail.outbound'))}</h3>
   ${list(outbound.map(edge => edge.to))}
   <h3>${escapeHtml(t('graph.detail.inbound'))}</h3>
@@ -128,7 +141,7 @@ function renderContent(
 
   const body = content === undefined
     ? `<p class="meta">${escapeHtml(t('graph.content.missing'))}</p>`
-    : `<pre class="prose graph-content__body">${escapeHtml(toDisplayText(content))}</pre>`
+    : `<pre class="prose">${escapeHtml(toDisplayText(content))}</pre>`
 
   return `<section class="panel graph-content">
   <h2>${escapeHtml(t('graph.content.title'))}</h2>
@@ -173,10 +186,13 @@ export function renderGraphPage(options: GraphPageOptions): string {
   const svg = visible.length === 0
     ? `<p class="empty">${escapeHtml(t('graph.empty'))}</p>`
     : `<svg class="graph" viewBox="0 0 ${String(SVG_WIDTH)} ${String(SVG_HEIGHT)}" role="img" aria-label="${escapeHtml(t('graph.title'))}" data-graph>
-  <g class="graph-columns">${columns}</g>
-  <g class="graph-edges">${edges}</g>
-  <g class="graph-nodes">${nodes}</g>
+  <g class="graph-viewport" data-graph-viewport>
+    <g class="graph-columns">${columns}</g>
+    <g class="graph-edges">${edges}</g>
+    <g class="graph-nodes">${nodes}</g>
+  </g>
 </svg>`
+  const graphPanel = visible.length === 0 ? svg : `${svg}${renderZoomTools()}`
 
   const legend = OWNERSHIPS.map((category) => {
     const count = graph.nodes.filter(node => node.ownership === category).length
@@ -201,8 +217,8 @@ export function renderGraphPage(options: GraphPageOptions): string {
   <label class="filters__field">${escapeHtml(t('graph.filter.ownership'))}<select name="ownership">${ownershipOptions}</select></label>
   <button class="button" type="submit">${escapeHtml(t('graph.filter.apply'))}</button>
 </form>
-<div class="split split--graph">
-  <section class="panel graph-panel">${svg}</section>
+<div class="split split--graph${visible.length === 0 ? '' : ' split--graph--bounded'}">
+  <section class="panel graph-panel">${graphPanel}</section>
   ${renderDetail(selected, graph, kind, ownership)}
 </div>
 <section class="panel">
