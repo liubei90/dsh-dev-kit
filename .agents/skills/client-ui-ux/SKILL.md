@@ -61,6 +61,10 @@ Scrollbars stay inside their container: use the shared scrollbar styles rather t
 
 - Review every changed region for gaps: nothing sits flush against its neighbour without an intentional gap, and adjacent icons and elements keep the region's established spacing.
 - Prefer symmetry for parallel elements; an unexplained one-off gap or offset usually signals a missed shared value.
+- **For complex pages and containers, establish shared horizontal and vertical alignment axes before adjusting local spacing.** Consider hover, selected, and expanded/collapsed states, and the relationship with adjacent panels. Choose a reference by layout similarity:
+  - **Sidebar:** align corresponding text starts and leading icons across vertically stacked rows; keep hover and selected row backgrounds on the same horizontal basis as the buttons above the list.
+  - **List page:** keep content on one shared left edge; a row's hover background may extend beyond that edge while the content stays in place.
+  - **Two-panel headers:** align the first header rows across both panels and match their heights; do the same for the second rows, and align corresponding underlines and dividers on shared horizontal baselines.
 
 ## Responsive layout
 
