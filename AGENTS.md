@@ -82,6 +82,7 @@ pnpm run change-scope --base <base>   # 本次 diff 范围;必须带 --base,否�
 - 每个事实只有一个家:同一条规则只陈述一次,其余改为链接(层级见 [docs/AGENTS.md](docs/AGENTS.md))。
 - 注释保持本地:不复述代码,不展开无关注释([prose-standard](.agents/skills/prose-standard/SKILL.md))。
 - 客户端 UI 文案走 i18n 字典,不硬编码进组件;英文文案用 sentence case(只首词、专有名词与产品名大写,如 `Git worktrees`),中文按自身习惯。
+- UI 变更以 [client-ui-ux](.agents/skills/client-ui-ux/SKILL.md) 为设计与评审入口,按需加载其 references。
 - 文件以单个尾随换行结尾;`git diff --cached --check`(pre-commit)把关。
 - 非平凡变更必须在同一 PR 附带 Agent Note;仅机械/局部编辑豁免,更新已拥有该决策的笔记即算([规则](.agents/notes/README.md)、[implemented 笔记](.agents/notes/implemented/AGENTS.md))。
 
