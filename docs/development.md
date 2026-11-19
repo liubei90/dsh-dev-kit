@@ -39,10 +39,10 @@ node scripts/install-git-hooks.mjs
 
 [.github/workflows/ci.yml](../.github/workflows/ci.yml) 分两个 job:
 
-- `gates` 在 Node 24.9 与 26 上跑 `pnpm run lint`、`pnpm run typecheck`、`pnpm run test`、`pnpm run doc-sync`、`pnpm run test:coverage`、`pnpm run build`(含产物平面校验)。
+- `gates` 在 Node 24.9 与 26 上跑 `pnpm run lint`、`pnpm run typecheck`、`pnpm run verify-empty-catch`、`pnpm run test`、`pnpm run doc-sync`、`pnpm run test:coverage`、`pnpm run build`(含产物平面校验)。
 - `e2e` 只在 PR 上跑,执行 `pnpm run test:e2e`;没有凭据或尚无 e2e 用例时不会失败,因为 [vitest.e2e.config.ts](../vitest.e2e.config.ts) 设了 `passWithNoTests: true`,单个用例用 `describe.skipIf` 在自己依赖的环境缺失时跳过。
 
-`pnpm run check:all` 是本地全量(`doc-sync` + lint + typecheck + test + build)。hooks 只做秒级检查,全量证据由 CI 承担。
+`pnpm run check:all` 是本地全量(`doc-sync` + lint + typecheck + empty-catch + test + build)。hooks 只做秒级检查,全量证据由 CI 承担。
 
 ## TODO 标记
 

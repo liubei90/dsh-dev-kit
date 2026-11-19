@@ -1,6 +1,6 @@
 ---
 name: error-handling
-description: Apply error-handling principles when designing or reviewing failures, recovery, retries, background tasks, and user-visible error reports.
+description: Apply error-handling principles when designing or reviewing failures, error classes and codes, recovery, retries, background tasks, and user-visible error reports.
 ---
 
 # Error handling
@@ -16,6 +16,37 @@ Expected failures need declared types, stable discriminants, and handling-releva
 For each failure, define handling and reporting owners, containment, and guarantees in the owning API documentation: valid invariants, absent/partial/committed/unknown effects, and cleanup responsibility. Background work retains these obligations.
 
 Catching limits exception propagation, not mutations. Only the affected state's owner can establish safe continuation. Otherwise stop dependent work, discard invalid state or instances, or escalate. Logging alone is not recovery. Retries require safe repetition, cancellation, and an explicit owner; finite operations need budgets, while continuing supervision needs lifecycle ownership and observable degradation.
+
+## Empty catch clauses
+
+An empty `catch` has no statement other than `;` in its block, and it discards every failure its `try` raises. Use one only when every such failure is deliberately ignored: name the error and state in a comment why no handling is needed. Keep the `try` holding one statement; a wider `try` hides statements whose failures the clause also discards. `verify-empty-catch` enforces this rule, and [general.md](../../../docs/defensive-patterns/general.md) is its standing home.
+
+```ts
+// Rejected: three statements in one try; the clause hides two more failures.
+try {
+  await unlink(tempFile)
+  registry.delete(id)
+  emit('removed', id)
+} catch (_cleanupFailed) {
+  // A leftover temporary file holds no state anything reads.
+}
+
+// Accepted: one statement, a named error, and a reason.
+try {
+  await unlink(tempFile)
+} catch (_cleanupFailed) {
+  // The caller re-derives this path, so a stale file is harmless.
+}
+```
+
+## Error codes
+
+An error class carries a `name` and a `code` beside `message` and `cause`; consumers, logs and analytics route on those fields, never on message text.
+
+- `name` is the class name in PascalCase ending in `Error`. Assign it as a string literal in the constructor, because a bundler may rename a colliding class binding.
+- `code` matches `^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$` and names the condition by what the consumer does next, not where it happened: `DB_NOT_FOUND`, `AUTH_TOKEN_EXPIRED`.
+- A code is a literal. Never build one from a template string, a status number, a path, an id or a foreign code.
+- Reuse the owning domain's class and code before inventing one. Renaming or reclassifying a recorded code is an externally visible change.
 
 ## Localized, actionable, visible reports
 

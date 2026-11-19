@@ -36,7 +36,7 @@ pnpm run test:coverage  # vitest run --coverage
 pnpm run test:e2e       # 端到端(真浏览器/真 API,无凭据自跳过)
 pnpm run test:affected  # 只跑本次 diff 影响的测试
 pnpm run doc-sync       # 文档门禁聚合(scripts/run-gates.ts doc-sync)
-pnpm run check:all      # doc-sync + lint + typecheck + test + build
+pnpm run check:all      # doc-sync + lint + typecheck + empty-catch + test + build
 pnpm run console        # 参考控制台:http://127.0.0.1:4310/_console
 pnpm run change-scope --base <base>   # 本次 diff 范围;必须带 --base,否则报错退出 2
 ```

@@ -63,6 +63,7 @@ const GATES: readonly Gate[] = [
   scriptGate('doc-budgets', 'verify-doc-budgets', 'documentation budgets'),
   scriptGate('asset-ownership', 'verify-asset-ownership', 'asset ownership'),
   scriptGate('skill-invocation-metadata', 'verify-skill-invocation-metadata', 'skill invocation metadata'),
+  scriptGate('empty-catch', 'verify-empty-catch', 'empty catch'),
   // A group gate: `check-all` depends on it, and it expands to the scripts above.
   { id: 'doc-sync', label: 'documentation gates', needs: DOCUMENTATION_GATE_IDS },
   scriptGate('lint', 'lint'),
@@ -74,7 +75,7 @@ const GATES: readonly Gate[] = [
 /** Mode membership; dependencies are pulled in transitively through `needs`. */
 const MODES: Readonly<Record<string, readonly string[]>> = {
   'doc-sync': ['doc-sync'],
-  'check-all': ['doc-sync', 'lint', 'typecheck', 'test', 'build'],
+  'check-all': ['doc-sync', 'lint', 'typecheck', 'empty-catch', 'test', 'build'],
 }
 
 /** Look up one declared gate. */
